@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests()
-                .antMatchers("/member/create", "/home", "/member/login","/","/main").permitAll()
+                .antMatchers("/home", "/member/login","/","/main", "/member/signup").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
