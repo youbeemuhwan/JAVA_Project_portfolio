@@ -7,6 +7,8 @@ import org.hibernate.annotations.DynamicInsert;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,6 +32,10 @@ public class Member {
     private String password;
 
     private Integer point;
+
+    @OneToMany(mappedBy = "member")
+    private List<Board> board = new ArrayList<Board>();
+
 
     @Builder
     public Member(String email, String username, String password, Integer point) {
