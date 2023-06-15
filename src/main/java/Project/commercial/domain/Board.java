@@ -1,5 +1,6 @@
 package Project.commercial.domain;
 
+import Project.commercial.Dto.BoardModifiedRequestDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,7 +32,7 @@ public class Board {
 
     private LocalDateTime modified_at;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", updatable = false)
     private Member member;
 
@@ -43,5 +44,11 @@ public class Board {
         this.created_at = created_at;
         this.modified_at = modified_at;
         this.member = member;
+    }
+
+    public void updateBoard(BoardModifiedRequestDto modifiedRequestDto){
+        this.title = modifiedRequestDto.getTitle();
+        this.content = modifiedRequestDto.getContent();
+        this.modified_at = modifiedRequestDto.getModified_at();
     }
 }
