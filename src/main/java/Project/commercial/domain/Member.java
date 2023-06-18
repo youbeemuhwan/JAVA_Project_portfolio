@@ -2,6 +2,7 @@ package Project.commercial.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -36,6 +37,7 @@ public class Member {
     private Integer point;
 
     @OneToMany(mappedBy = "member")
+    @BatchSize(size = 100)
     private List<Board> board = new ArrayList<Board>();
 
 

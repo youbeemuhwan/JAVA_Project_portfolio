@@ -1,9 +1,7 @@
 package Project.commercial.service;
 
-import Project.commercial.Dto.BoardCreateRequestDto;
-import Project.commercial.Dto.BoardCreateResponseDto;
-import Project.commercial.Dto.BoardModifiedRequestDto;
-import Project.commercial.Dto.BoardModifiedResponseDto;
+
+import Project.commercial.Dto.*;
 import Project.commercial.domain.Board;
 import Project.commercial.domain.Member;
 import Project.commercial.repository.BoardRepository;
@@ -17,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,16 +51,7 @@ public class BoardService {
 
 
     public BoardModifiedResponseDto modified(BoardModifiedRequestDto boardModifiedRequestDto, Authentication authentication){
-        Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(
-                () -> (new RuntimeException("잘못된 접근 입니다.")));
-        Board board = boardRepository.findById(boardModifiedRequestDto.getId()).orElseThrow(
-                () -> (new RuntimeException("해당 게시글은 존재하지 않습니다.")));
-
-        if(!board.getMember().equals(member))
-        {
-            throw new RuntimeException("게시글 수정 권한이 없습니다.");
-
-        }
+        Board board = getBoardAuthority(boardModifiedRequestDto, authentication);
 
         boardModifiedRequestDto.setModified_at(LocalDateTime.now());
 
@@ -74,18 +65,90 @@ public class BoardService {
                 .build();
     }
 
-    public void delete(Long id){
-        Board board = boardRepository.findById(id).orElseThrow(
-                ()-> (new RuntimeException("해당 게시글은 존재하지 않습니다.")));
+
+
+    public void delete(BoardModifiedRequestDto boardModifiedRequestDto, Authentication authentication){
+        Board board = getBoardAuthority(boardModifiedRequestDto, authentication);
 
         boardRepository.delete(board);
     }
 
-    public Page<Board> list(Pageable pageable){
-       return boardRepository.findAll(pageable);
+
+
+
+
+    public List<BoardDto> listByMember(Authentication authentication,Pageable pageable){
+        Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(
+                () -> (new RuntimeException("잘못된 접근입니다.")));
+
+        Page<Board> findBoards = boardRepository.findByMember_id(member.getId(), pageable);
+        return getBoardList(findBoards);
+
+
+
+
+
+
 
     }
 
+    public List<BoardDto> search(String keyword, Pageable pageable){
+        Page<Board> findBoards = boardRepository.findByTitleContaining(keyword, pageable);
+        return getBoardList(findBoards);
+
+    }
+
+    public List<BoardDto> list(Pageable pageable){
+        Page<Board> findBoards = boardRepository.findAll(pageable);
+        return getBoardList(findBoards);
+
+    }
+
+    private List<BoardDto> getBoardList(Page<Board> boards) {
+        int number = boards.getNumberOfElements();
+        List<BoardDto> BoardList = new ArrayList<>();
+
+        for(int i = 0; i <= number -1; i++ ){
+
+            Member member = boards.getContent().get(i).getMember();
+            Board board = boards.getContent().get(i);
+
+
+           MemberDto memberDto =
+                     MemberDto.builder()
+                    .id(member.getId())
+                    .email(member.getEmail())
+                    .username(member.getUsername())
+                    .build();
+
+            BoardDto boardDto =
+                    BoardDto.builder()
+                    .id(board.getId())
+                    .content(board.getContent())
+                    .created_at(board.getCreated_at())
+                    .modified_at(board.getModified_at())
+                    .member(memberDto)
+                    .build();
+
+            BoardList.add(boardDto);
+        }
+
+        return BoardList;
+    }
+
+    private Board getBoardAuthority(BoardModifiedRequestDto boardModifiedRequestDto, Authentication authentication) {
+        Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(
+                () -> (new RuntimeException("잘못된 접근 입니다.")));
+        Board board = boardRepository.findById(boardModifiedRequestDto.getId()).orElseThrow(
+                () -> (new RuntimeException("해당 게시글은 존재하지 않습니다.")));
+
+        if(!board.getMember().equals(member))
+        {
+            throw new RuntimeException("게시글에 대한 권한이 없습니다.");
+
+        }
+        return board;
+    }
 
 
 }
