@@ -29,6 +29,18 @@ public class MemberController {
     @ResponseBody
     public MemberLoginResponseDto login(@RequestBody MemberLoginRequestDto memberLoginRequestDto){
         return memberService.login(memberLoginRequestDto);
-
     }
+
+    @GetMapping("/member/logout")
+    @ResponseBody
+    public String logout(){
+        return "logout done";
+    }
+
+    @GetMapping("/member/testToken")
+    @ResponseBody
+    public String testToken(){
+        return "Token Available";
+    }
+
 }

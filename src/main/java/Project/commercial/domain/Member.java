@@ -1,12 +1,16 @@
 package Project.commercial.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,9 +31,15 @@ public class Member {
     private String username;
 
     @NotNull
+    @JsonIgnore
     private String password;
 
     private Integer point;
+
+    @OneToMany(mappedBy = "member")
+    @BatchSize(size = 100)
+    private List<Board> board = new ArrayList<Board>();
+
 
     @Builder
     public Member(String email, String username, String password, Integer point) {
