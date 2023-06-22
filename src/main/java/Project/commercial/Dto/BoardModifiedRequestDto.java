@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-
 public class BoardModifiedRequestDto {
 
     private Long id;
@@ -16,6 +15,8 @@ public class BoardModifiedRequestDto {
     private String title;
 
     private String content;
+
+    private Integer star_rate;
 
     private LocalDateTime modified_at;
 }

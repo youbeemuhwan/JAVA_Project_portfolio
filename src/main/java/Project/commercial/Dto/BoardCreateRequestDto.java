@@ -5,10 +5,6 @@ import Project.commercial.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
@@ -25,6 +21,8 @@ public class BoardCreateRequestDto {
 
    private LocalDateTime modified_at;
 
+   private Integer star_rate;
+
     private Member member;
 
 
@@ -32,6 +30,7 @@ public class BoardCreateRequestDto {
         return Board.builder()
                 .title(boardCreateRequestDto.getTitle())
                 .content(boardCreateRequestDto.getContent())
+                .star_rate(boardCreateRequestDto.getStar_rate())
                 .created_at(boardCreateRequestDto.getCreated_at())
                 .member(boardCreateRequestDto.getMember())
                 .build();
