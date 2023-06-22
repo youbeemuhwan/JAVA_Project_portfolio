@@ -4,10 +4,6 @@ import Project.commercial.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
@@ -21,12 +17,15 @@ public class BoardModifiedResponseDto {
 
     private String content;
 
+    private Integer star_rate;
+
     private LocalDateTime modified_at;
 
-    public BoardModifiedResponseDto(Long id, String title, String content, LocalDateTime modified_at) {
+    public BoardModifiedResponseDto(Long id, String title, String content,Integer star_rate ,LocalDateTime modified_at) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.star_rate = star_rate;
         this.modified_at = modified_at;
     }
 }

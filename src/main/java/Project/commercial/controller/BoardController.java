@@ -8,7 +8,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -20,9 +22,11 @@ public class BoardController {
 
     @PostMapping("/board/create")
     @ResponseBody
-    public BoardCreateResponseDto create(@RequestBody BoardCreateRequestDto boardCreateRequestDto,
-                                         Authentication authentication){
-        return boardService.create(boardCreateRequestDto, authentication);
+    public BoardCreateResponseDto create(@RequestPart(value = "BoardCreateRequestDto") BoardCreateRequestDto boardCreateRequestDto,
+                                         @RequestPart(value = "files", required = false) List<MultipartFile> files
+                                         ,Authentication authentication
+                                         ) throws IOException {
+        return boardService.create(boardCreateRequestDto, files ,authentication);
     }
 
     @PatchMapping("/board/modified")
@@ -36,14 +40,17 @@ public class BoardController {
     @DeleteMapping("/board/delete")
     @ResponseBody
     public String delete(@RequestBody BoardModifiedRequestDto boardModifiedRequestDto,
-                         Authentication authentication){
+                         Authentication authentication)
+    {
         boardService.delete(boardModifiedRequestDto, authentication);
         return "Delete Done";
     }
 
     @GetMapping("/board/list")
     @ResponseBody
-    public List<BoardDto> list(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+    public List<BoardDto> list(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC)
+                                   Pageable pageable)
+    {
         return boardService.list(pageable);
     }
 
@@ -51,7 +58,8 @@ public class BoardController {
     @GetMapping("/board/list/member")
     @ResponseBody
     public List<BoardDto> listByMember(Authentication authentication,
-                                    @PageableDefault(size=5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+                                    @PageableDefault(size=5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
+    {
        return boardService.listByMember(authentication, pageable);
 
 
@@ -60,7 +68,8 @@ public class BoardController {
     @GetMapping("/board/search")
     @ResponseBody
     public List<BoardDto> search(@RequestParam String keyword,
-                              @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+                              @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
+    {
         return boardService.search(keyword, pageable);
     }
 
