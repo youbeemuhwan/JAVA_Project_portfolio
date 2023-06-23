@@ -55,22 +55,37 @@ public class BoardController {
     }
 
 
-    @GetMapping("/board/list/member")
+    @GetMapping("/board/list/me")
     @ResponseBody
-    public List<BoardDto> listByMember(Authentication authentication,
+    public List<BoardDto> listByMe(Authentication authentication,
                                     @PageableDefault(size=5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
     {
-       return boardService.listByMember(authentication, pageable);
+       return boardService.listByMe(authentication, pageable);
 
 
     }
 
-    @GetMapping("/board/search")
+    @GetMapping("/board/list/member")
+    @ResponseBody
+    public List<BoardDto> listByMember(Long member_id,
+                                       @PageableDefault(size=5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+        return boardService.listByMember(member_id, pageable);
+
+    }
+
+    @GetMapping("/board/list/search")
     @ResponseBody
     public List<BoardDto> search(@RequestParam String keyword,
                               @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
     {
         return boardService.search(keyword, pageable);
+    }
+
+    @GetMapping("/board/detail")
+    @ResponseBody
+    public BoardDto detailPage(@RequestBody Long board_id){
+        return boardService.detailPage(board_id);
+
     }
 
 
