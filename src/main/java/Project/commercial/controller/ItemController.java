@@ -3,6 +3,7 @@ package Project.commercial.controller;
 import Project.commercial.Dto.*;
 import Project.commercial.domain.Item;
 import Project.commercial.service.ItemService;
+import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,14 @@ public class ItemController {
     public List<ItemDto> list(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return itemService.list(pageable);
     }
+
+    @GetMapping("/item/list/search")
+    @ResponseBody
+    public List<ItemDto> search(@RequestBody ItemSearchConditionDto itemSearchConditionDto, @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return itemService.search(itemSearchConditionDto, pageable);
+    }
+
+
 
     @DeleteMapping("/item/delete")
     @ResponseBody

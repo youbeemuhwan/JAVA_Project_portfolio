@@ -3,6 +3,7 @@ package Project.commercial.service;
 import Project.commercial.Dto.*;
 import Project.commercial.domain.*;
 import Project.commercial.repository.*;
+import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +59,7 @@ public class ItemService {
         if (!CollectionUtils.isEmpty(files)) {
             extractFile(files, saveItem);
         }
-        
+
         List<DetailImage> detailImageList = detailImageRepository.findAllByItem_id(saveItem.getId());
 
         return ItemCreateResponseDto.builder()
@@ -97,6 +98,38 @@ public class ItemService {
 
         return itemDtoList;
     }
+
+    public List<ItemDto> search(ItemSearchConditionDto itemSearchConditionDto, Pageable pageable){
+        List<Item> itemList = itemRepository.searchItem(itemSearchConditionDto, pageable);
+
+        log.info("item amount = {}", pageable.getOffset());
+
+        List<ItemDto> itemDtoList = new ArrayList<>();
+
+        for (Item item : itemList){
+
+            ItemDto itemDto = ItemDto.builder()
+                    .id(item.getId())
+                    .category(item.getCategory())
+                    .detailCategory(item.getDetailCategory())
+                    .itemName(item.getItemName())
+                    .description(item.getDescription())
+                    .color(item.getColor())
+                    .size(item.getSize())
+                    .price(comma(item.getPrice()))
+                    .detailImage(item.getDetailImage())
+                    .build();
+
+
+            itemDtoList.add(itemDto);
+        }
+
+        return itemDtoList;
+
+
+    }
+
+
 
     public ItemDto detailPage(Map<String, Long> item_id_map) {
         Long itemId = item_id_map.get("item_id");
