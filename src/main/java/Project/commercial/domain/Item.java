@@ -57,17 +57,23 @@ public class Item {
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetailImage> detailImage = new ArrayList<>();
 
+    @OneToOne(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private ThumbnailImage thumbnailImage;
+
+
+
     @Builder
-    public Item(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Integer price, Size size  ,List<DetailImage> detailImage) {
+    public Item(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, Integer price, List<DetailImage> detailImage, ThumbnailImage thumbnailImage) {
         this.id = id;
         this.category = category;
         this.detailCategory = detailCategory;
         this.itemName = itemName;
         this.description = description;
         this.color = color;
-        this.price = price;
         this.size = size;
+        this.price = price;
         this.detailImage = detailImage;
+        this.thumbnailImage = thumbnailImage;
     }
 
     public void updateItem(ItemModifiedResponseDto itemModifiedResponseDto){
@@ -78,8 +84,6 @@ public class Item {
         this.color = itemModifiedResponseDto.getColor();
         this.size = itemModifiedResponseDto.getSize();
         this.price = (itemModifiedResponseDto.getPrice());
-
-
     }
 
 

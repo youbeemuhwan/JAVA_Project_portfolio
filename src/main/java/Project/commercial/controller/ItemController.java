@@ -27,8 +27,9 @@ public class ItemController {
     @PostMapping("/item/create")
     @ResponseBody
     public ItemCreateResponseDto create(@RequestPart ItemCreateRequestDto itemCreateRequestDto,
-                                        @RequestPart(required = false) List<MultipartFile> files) throws IOException {
-        return itemService.create(itemCreateRequestDto, files);
+                                        @RequestPart MultipartFile thumbnail_image,
+                                        @RequestPart(required = false) List<MultipartFile> detail_images) throws IOException {
+        return itemService.create(itemCreateRequestDto,thumbnail_image ,detail_images);
     }
 
     @GetMapping("/item/list/detail")
@@ -62,8 +63,10 @@ public class ItemController {
     @PatchMapping("/item/modified")
     @ResponseBody
     public ItemModifiedResponseDto modified(@RequestPart ItemModifiedRequestDto itemModifiedRequestDto,
-                                            @RequestPart(required = false) List<MultipartFile> files ) throws IOException{
-       return  itemService.modified(itemModifiedRequestDto, files);
+                                            @RequestPart (required = false) MultipartFile new_thumbnail_image,
+                                            @RequestPart(required = false) List<MultipartFile> detail_images ) throws IOException{
+
+       return  itemService.modified(itemModifiedRequestDto,new_thumbnail_image ,detail_images);
 
 
     }

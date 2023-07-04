@@ -37,6 +37,7 @@ public class Member {
     private Integer point;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+
     private List<Board> board = new ArrayList<Board>();
 
 

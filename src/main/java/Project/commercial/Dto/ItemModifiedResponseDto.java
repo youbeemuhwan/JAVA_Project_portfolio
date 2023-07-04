@@ -34,7 +34,9 @@ public class ItemModifiedResponseDto {
 
     private List<DetailImage> detailImage = new ArrayList<>();
 
-    public ItemModifiedResponseDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, Integer price, List<DetailImage> detailImage) {
+    private ThumbnailImage thumbnailImage;
+
+    public ItemModifiedResponseDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, Integer price, List<DetailImage> detailImage, ThumbnailImage thumbnailImage) {
         this.id = id;
         this.category = category;
         this.detailCategory = detailCategory;
@@ -43,7 +45,7 @@ public class ItemModifiedResponseDto {
         this.color = color;
         this.size = size;
         this.price = price;
-
         this.detailImage = detailImage;
+        this.thumbnailImage = thumbnailImage;
     }
 }

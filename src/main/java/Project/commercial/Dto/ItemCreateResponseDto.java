@@ -36,7 +36,9 @@ public class ItemCreateResponseDto {
     @Nullable
     private List<DetailImage> detailImage = new ArrayList<>();
 
-    public ItemCreateResponseDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, String price, List<DetailImage> detailImage) {
+    private ThumbnailImage thumbnailImage;
+
+    public ItemCreateResponseDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, String price, List<DetailImage> detailImage, ThumbnailImage thumbnailImage) {
         this.id = id;
         this.category = category;
         this.detailCategory = detailCategory;
@@ -46,5 +48,6 @@ public class ItemCreateResponseDto {
         this.size = size;
         this.price = price;
         this.detailImage = detailImage;
+        this.thumbnailImage = thumbnailImage;
     }
 }
