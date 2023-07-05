@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -33,10 +34,15 @@ public class ItemService {
     private final DetailCategoryRepository detailCategoryRepository;
     private final SizeRepository sizeRepository;
     private final ColorRepository colorRepository;
+    private final ThumbnailImageRepository thumbnailImageRepository;
     @Value("$(file.dir)")
     String fileDir;
 
-    public ItemCreateResponseDto create(ItemCreateRequestDto itemCreateRequestDto, List<MultipartFile> files) throws IOException {
+    public ItemCreateResponseDto create(ItemCreateRequestDto itemCreateRequestDto,MultipartFile thumbnail_image ,List<MultipartFile> detail_images) throws IOException {
+
+        if(thumbnail_image.isEmpty()){
+            throw new RuntimeException("썸네일 이미지는 필수값 입니다.");
+        }
 
         DetailCategory detailCategory_id = detailCategoryRepository.findById(itemCreateRequestDto.getDetailCategory_id()).orElseThrow();
         Category category_id = categoryRepository.findById(itemCreateRequestDto.getCategory_id()).orElseThrow();
@@ -54,24 +60,37 @@ public class ItemService {
                 .size(size_id)
                 .build();
 
-        Item saveItem = itemRepository.save(entity);
+        Item savedItem = itemRepository.save(entity);
 
-        if (!CollectionUtils.isEmpty(files)) {
-            extractFile(files, saveItem);
+        ThumbnailImageRequestDto thumbnailImageRequestDto = ThumbnailImageRequestDto.builder()
+                .uploadImageName(thumbnail_image.getOriginalFilename())
+                .storeImageName(createSaveFileName(thumbnail_image.getOriginalFilename()))
+                .fileSize(thumbnail_image.getSize())
+                .item(savedItem)
+                .build();
+
+        ThumbnailImage thumbnailImageRequestDtoEntity = thumbnailImageRequestDto.toEntity(thumbnailImageRequestDto);
+        thumbnailImageRepository.save(thumbnailImageRequestDtoEntity);
+
+
+        if (!CollectionUtils.isEmpty(detail_images)) {
+            extractFile(detail_images, savedItem);
         }
 
-        List<DetailImage> detailImageList = detailImageRepository.findAllByItem_id(saveItem.getId());
+        List<DetailImage> detailImageList = detailImageRepository.findAllByItem_id(savedItem.getId());
+        ThumbnailImage savedItemThumbnailImage = thumbnailImageRepository.findByItem_id(savedItem.getId()).orElseThrow();
 
         return ItemCreateResponseDto.builder()
-                .id(saveItem.getId())
-                .category(saveItem.getCategory())
-                .detailCategory(saveItem.getDetailCategory())
-                .itemName(saveItem.getItemName())
-                .description(saveItem.getDescription())
-                .color(saveItem.getColor())
-                .size(saveItem.getSize())
-                .price(comma(saveItem.getPrice()))
+                .id(savedItem.getId())
+                .category(savedItem.getCategory())
+                .detailCategory(savedItem.getDetailCategory())
+                .itemName(savedItem.getItemName())
+                .description(savedItem.getDescription())
+                .color(savedItem.getColor())
+                .size(savedItem.getSize())
+                .price(comma(savedItem.getPrice()))
                 .detailImage(detailImageList)
+                .thumbnailImage(savedItemThumbnailImage)
                 .build();
     }
 
@@ -90,7 +109,7 @@ public class ItemService {
                     .size(item.getSize())
                     .color(item.getColor())
                     .price(comma(item.getPrice()))
-                    .detailImage(item.getDetailImage())
+                    .thumbnailImage(item.getThumbnailImage())
                     .build();
 
             itemDtoList.add(build);
@@ -117,7 +136,7 @@ public class ItemService {
                     .color(item.getColor())
                     .size(item.getSize())
                     .price(comma(item.getPrice()))
-                    .detailImage(item.getDetailImage())
+                    .thumbnailImage(item.getThumbnailImage())
                     .build();
 
 
@@ -135,7 +154,7 @@ public class ItemService {
         Long itemId = item_id_map.get("item_id");
         Item item = itemRepository.findById(itemId).orElseThrow();
 
-        ItemDto buildDetailPage = ItemDto.builder()
+        return  ItemDto.builder()
                 .id(item.getId())
                 .category(item.getCategory())
                 .detailCategory(item.getDetailCategory())
@@ -145,9 +164,8 @@ public class ItemService {
                 .size(item.getSize())
                 .price(comma(item.getPrice()))
                 .detailImage(item.getDetailImage())
+                .thumbnailImage(item.getThumbnailImage())
                 .build();
-
-        return buildDetailPage;
     }
 
     public void delete(Map<String, Long> item_id_map) {
@@ -160,27 +178,53 @@ public class ItemService {
     }
 
 
-    public ItemModifiedResponseDto modified(ItemModifiedRequestDto itemModifiedRequestDto, List<MultipartFile> files) throws IOException {
-
+    public ItemModifiedResponseDto modified(ItemModifiedRequestDto itemModifiedRequestDto, MultipartFile new_thumbnail_image ,List<MultipartFile> new_detail_images) throws IOException {
         Item item = itemRepository.findById(itemModifiedRequestDto.getId()).orElseThrow(
                 () -> new RuntimeException("해당 아이템은 존재하지 않습니다.")
         );
+
+        if(new_thumbnail_image == null) {
+            throw new RuntimeException("썸네일 이미지는 필수 값 입니다.");
+        }
+
+        if (!(Objects.equals(new_thumbnail_image.getContentType(), "image/jpeg") || Objects.equals(new_thumbnail_image.getContentType(), "image/png")
+                || Objects.equals(new_thumbnail_image.getContentType(), "image/gif"))) {
+            throw new RuntimeException("해당 첨부파일 형식이 올바르지 않습니다.");
+        }
+
+        if(thumbnailImageRepository.findByItem_id(item.getId()).isPresent()){
+            thumbnailImageRepository.deleteByItem_id(item.getId());
+        }
+
+            ThumbnailImageRequestDto thumbnailImageRequestDto = ThumbnailImageRequestDto.builder()
+                    .uploadImageName(new_thumbnail_image.getOriginalFilename())
+                    .storeImageName(createSaveFileName(new_thumbnail_image.getOriginalFilename()))
+                    .fileSize(new_thumbnail_image.getSize())
+                    .item(item)
+                    .build();
+
+            thumbnailImageRepository.save(thumbnailImageRequestDto.toEntity(thumbnailImageRequestDto));
+            thumbnailImageRepository.flush();
+
+
 
         DetailCategory detailCategory = detailCategoryRepository.findById(itemModifiedRequestDto.getDetailCategory_id()).orElseThrow();
         Category category = categoryRepository.findById(itemModifiedRequestDto.getCategory_id()).orElseThrow();
         Color color = colorRepository.findById(itemModifiedRequestDto.getColor_id()).orElseThrow();
         Size size = sizeRepository.findById(itemModifiedRequestDto.getSize_id()).orElseThrow();
+        Item newItem = itemRepository.findById(itemModifiedRequestDto.getId()).orElseThrow();
 
-        List<DetailImage> detailImages = item.getDetailImage();
+        List<DetailImage> exist_detailImages = newItem.getDetailImage();
 
-        if (CollectionUtils.isEmpty(detailImages) && !CollectionUtils.isEmpty(files)) {
 
-            extractFile(files, item);
+        if (CollectionUtils.isEmpty(exist_detailImages) && !CollectionUtils.isEmpty(new_detail_images)){
+
+            extractFile(new_detail_images, newItem);
 
             log.info("케이스 1 : 상세이미지는 없고 파일은 있을때!");
 
             ItemModifiedResponseDto itemModifiedResponseDto = ItemModifiedResponseDto.builder()
-                    .id(item.getId())
+                    .id(newItem.getId())
                     .itemName(itemModifiedRequestDto.getItemName())
                     .description(itemModifiedRequestDto.getDescription())
                     .detailCategory(detailCategory)
@@ -189,6 +233,7 @@ public class ItemService {
                     .color(color)
                     .price(itemModifiedRequestDto.getPrice())
                     .detailImage(detailImageRepository.findAllByItem_id(item.getId()))
+                    .thumbnailImage(thumbnailImageRepository.findByItem_id(item.getId()).orElseThrow())
                     .build();
 
             item.updateItem(itemModifiedResponseDto);
@@ -196,13 +241,14 @@ public class ItemService {
             return itemModifiedResponseDto;
         }
 
-        if (!CollectionUtils.isEmpty(detailImages) && CollectionUtils.isEmpty(files)) {
+        if (!CollectionUtils.isEmpty(exist_detailImages) && CollectionUtils.isEmpty(new_detail_images)) {
             log.info("케이스 2 : 상세이미지는 있는데 파일은 없을때!");
 
-            detailImageRepository.deleteByItem_id(item.getId());
+            detailImageRepository.deleteByItem_id(newItem.getId());
+
 
             ItemModifiedResponseDto itemModifiedResponseDto = ItemModifiedResponseDto.builder()
-                    .id(item.getId())
+                    .id(newItem.getId())
                     .itemName(itemModifiedRequestDto.getItemName())
                     .description(itemModifiedRequestDto.getDescription())
                     .detailCategory(detailCategory)
@@ -210,7 +256,8 @@ public class ItemService {
                     .size(size)
                     .color(color)
                     .price(itemModifiedRequestDto.getPrice())
-                    .detailImage(detailImageRepository.findAllByItem_id(item.getId()))
+                    .detailImage(detailImageRepository.findAllByItem_id(newItem.getId()))
+                    .thumbnailImage(thumbnailImageRepository.findByItem_id(newItem.getId()).orElseThrow())
                     .build();
 
             item.updateItem(itemModifiedResponseDto);
@@ -219,32 +266,34 @@ public class ItemService {
 
         }
 
-        if (!CollectionUtils.isEmpty(detailImages) && !CollectionUtils.isEmpty(files)) {
+        if (!CollectionUtils.isEmpty(exist_detailImages) && !CollectionUtils.isEmpty(new_detail_images)) {
 
             log.info("케이스 3 : 상세이미지 와 파일 모두 존재 할때");
 
-            detailImageRepository.deleteByItem_id(item.getId());
+            detailImageRepository.deleteByItem_id(newItem.getId());
 
-            for (MultipartFile file : files) {
-                String originalFilename = file.getOriginalFilename();
+
+            for (MultipartFile new_detail_image : new_detail_images) {
+                String originalFilename = new_detail_image.getOriginalFilename();
                 String saveFileName = createSaveFileName(originalFilename);
 
-                long fileSizeFile = file.getSize();
 
-                file.transferTo(new File(getFullPath(saveFileName)));
+                long fileSizeFile = new_detail_image.getSize();
+
+                new_detail_image.transferTo(new File(getFullPath(saveFileName)));
 
                 DetailImageRequestDto detailImageRequestDto = DetailImageRequestDto.builder()
                         .storeImageName(saveFileName)
                         .uploadImageName(originalFilename)
                         .fileSize(fileSizeFile)
-                        .item(item)
+                        .item(newItem)
                         .build();
 
                 detailImageRepository.save(detailImageRequestDto.toEntity(detailImageRequestDto));
             }
 
             ItemModifiedResponseDto itemModifiedResponseDto = ItemModifiedResponseDto.builder()
-                    .id(item.getId())
+                    .id(newItem.getId())
                     .itemName(itemModifiedRequestDto.getItemName())
                     .description(itemModifiedRequestDto.getDescription())
                     .detailCategory(detailCategory)
@@ -252,15 +301,17 @@ public class ItemService {
                     .size(size)
                     .color(color)
                     .price(itemModifiedRequestDto.getPrice())
-                    .detailImage(detailImageRepository.findAllByItem_id(item.getId()))
+                    .detailImage(detailImageRepository.findAllByItem_id(newItem.getId()))
+                    .thumbnailImage(newItem.getThumbnailImage())
                     .build();
 
             item.updateItem(itemModifiedResponseDto);
 
             return itemModifiedResponseDto;
         }
+
         ItemModifiedResponseDto itemModifiedResponseDto = ItemModifiedResponseDto.builder()
-                .id(item.getId())
+                .id(newItem.getId())
                 .itemName(itemModifiedRequestDto.getItemName())
                 .description(itemModifiedRequestDto.getDescription())
                 .detailCategory(detailCategory)
@@ -268,7 +319,8 @@ public class ItemService {
                 .size(size)
                 .color(color)
                 .price(itemModifiedRequestDto.getPrice())
-                .detailImage(item.getDetailImage())
+                .detailImage(newItem.getDetailImage())
+                .thumbnailImage(newItem.getThumbnailImage())
                 .build();
 
         item.updateItem(itemModifiedResponseDto);
@@ -297,21 +349,16 @@ public class ItemService {
 
     public String comma(int value) {
         DecimalFormat df = new DecimalFormat("###,###");
-        String value_str = df.format(value);
-        return value_str;
+        return df.format(value);
     }
 
-    public int discount(int price, int discountRate){
-        double discount = discountRate / 100;
-        int resultPrice = (int) (price * discount);
-        return resultPrice;
 
-    }
 
-    private void extractFile(@Nullable List<MultipartFile> files, Item saveItem) throws IOException {
+    private void extractFile(List<MultipartFile> files, Item saveItem) throws IOException {
         for (MultipartFile file : files) {
-            if (!(file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/png")
-                    || file.getContentType().equals("image/gif"))) {
+
+            if (!(Objects.equals(file.getContentType(), "image/jpeg") || Objects.equals(file.getContentType(), "image/png")
+                    || Objects.equals(file.getContentType(), "image/gif"))) {
                 throw new RuntimeException("해당 첨부파일 형식이 올바르지 않습니다.");
             }
             String originalFilename = file.getOriginalFilename();

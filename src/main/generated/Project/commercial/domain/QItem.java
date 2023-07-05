@@ -40,6 +40,8 @@ public class QItem extends EntityPathBase<Item> {
 
     public final QSize size;
 
+    public final QThumbnailImage thumbnailImage;
+
     public QItem(String variable) {
         this(Item.class, forVariable(variable), INITS);
     }
@@ -62,6 +64,7 @@ public class QItem extends EntityPathBase<Item> {
         this.color = inits.isInitialized("color") ? new QColor(forProperty("color")) : null;
         this.detailCategory = inits.isInitialized("detailCategory") ? new QDetailCategory(forProperty("detailCategory")) : null;
         this.size = inits.isInitialized("size") ? new QSize(forProperty("size")) : null;
+        this.thumbnailImage = inits.isInitialized("thumbnailImage") ? new QThumbnailImage(forProperty("thumbnailImage"), inits.get("thumbnailImage")) : null;
     }
 
 }
