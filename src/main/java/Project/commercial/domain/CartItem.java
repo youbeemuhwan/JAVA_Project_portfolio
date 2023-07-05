@@ -1,12 +1,12 @@
 package Project.commercial.domain;
 
 
+import Project.commercial.Dto.CartItemModifiedRequestDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.relational.core.sql.In;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -22,7 +22,7 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)  // 오류 발생
     @JoinColumn(name = "item_id", updatable = false)
     @NotNull
     private Item item;
@@ -43,5 +43,11 @@ public class CartItem {
         this.item = item;
         this.quantity = quantity;
         this.cart = cart;
+    }
+
+    public void updateCartItem(CartItemModifiedRequestDto cartItemModifiedRequestDto){
+        this.quantity = cartItemModifiedRequestDto.getQuantity();
+
+
     }
 }

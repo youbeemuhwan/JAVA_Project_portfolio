@@ -14,17 +14,5 @@ public class CartAddRequestDto {
     private Integer quantity;
 
 
-//    public Cart toCartEntity(CartAddRequestDto cartAddRequestDto){
-//        return Cart.builder()
-//                .member(cartAddRequestDto.getMember())
-//                .build();
-//    }
-
-
-
-
-
-
-
 
 }

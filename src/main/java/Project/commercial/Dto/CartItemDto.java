@@ -1,8 +1,6 @@
 package Project.commercial.Dto;
 
-import Project.commercial.domain.Cart;
-import Project.commercial.domain.CartItem;
-import Project.commercial.domain.Item;
+import Project.commercial.domain.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,18 +10,27 @@ import lombok.Setter;
 @Builder
 public class CartItemDto {
 
-    private Cart cart;
+    private Long id;
 
-    private Item item;
+    private String itemName;
+
+    private Color color;
+
+    private Size size;
+
+    private String price;
 
     private Integer quantity;
 
-    public CartItem toEntity(CartItemDto cartItemDto){
-        return CartItem.builder()
-                .item(cartItemDto.getItem())
-                .cart(cartItemDto.getCart())
-                .quantity(cartItemDto.getQuantity())
-                .build();
-    }
+    private ThumbnailImage thumbnailImages;
 
+    public CartItemDto(Long id, String itemName, Color color, Size size, String price, Integer quantity, ThumbnailImage thumbnailImages) {
+        this.id = id;
+        this.itemName = itemName;
+        this.color = color;
+        this.size = size;
+        this.price = price;
+        this.quantity = quantity;
+        this.thumbnailImages = thumbnailImages;
+    }
 }

@@ -12,7 +12,7 @@ import lombok.Setter;
 @Builder
 public class CartAddResponseDto {
 
-    private CartDto cart;
+    private Cart cart;
 
 
 

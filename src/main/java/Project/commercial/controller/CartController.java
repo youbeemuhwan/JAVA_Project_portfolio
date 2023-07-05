@@ -1,17 +1,18 @@
 package Project.commercial.controller;
 
-import Project.commercial.Dto.CartAddRequestDto;
-import Project.commercial.Dto.CartAddResponseDto;
+import Project.commercial.Dto.*;
 import Project.commercial.domain.Cart;
+import Project.commercial.domain.CartItem;
 import Project.commercial.service.CartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,16 +23,30 @@ public class CartController {
 
     @PostMapping("/cart/add")
     @ResponseBody
-    public Cart addCartItem(@RequestBody CartAddRequestDto cartAddRequestDto, Authentication authentication){
-
-        log.info("cartAddRequest = {}", cartAddRequestDto);
-        log.info("cartAddRequest = {}", cartAddRequestDto.getItem_id());
-        log.info("cartAddRequest = {}", cartAddRequestDto.getQuantity());
-
-        log.info("cartAddRequest = {}", authentication.getName());
-        log.info("cartAddRequest = {}", authentication);
+    public CartItemDto addCartItem(@RequestBody CartAddRequestDto cartAddRequestDto, Authentication authentication){
 
         return cartService.addItem(cartAddRequestDto, authentication);
 
     }
+
+    @PatchMapping("/cart/modified")
+    @ResponseBody
+    public CartItemListDto modified(@RequestBody CartItemModifiedRequestDto cartItemModifiedRequestDto, Authentication authentication){
+        return cartService.modified(cartItemModifiedRequestDto, authentication);
+    }
+
+    @GetMapping("/cart/my_cart")
+    @ResponseBody
+    public CartItemListDto myCartList(Authentication authentication){
+        return cartService.list(authentication);
+    }
+
+    @DeleteMapping("/cart/delete")
+    @ResponseBody
+    public String delete(@RequestBody Map<String, Long> item_id_map, Authentication authentication){
+        cartService.delete(item_id_map, authentication);
+        return "DELETE DONE";
+    }
+
+
 }
