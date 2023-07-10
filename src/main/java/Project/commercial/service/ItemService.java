@@ -40,7 +40,8 @@ public class ItemService {
 
     public ItemCreateResponseDto create(ItemCreateRequestDto itemCreateRequestDto,MultipartFile thumbnail_image ,List<MultipartFile> detail_images) throws IOException {
 
-        if(thumbnail_image.isEmpty()){
+        if(thumbnail_image.isEmpty())
+        {
             throw new RuntimeException("썸네일 이미지는 필수값 입니다.");
         }
 
@@ -48,7 +49,6 @@ public class ItemService {
         Category category_id = categoryRepository.findById(itemCreateRequestDto.getCategory_id()).orElseThrow();
         Color color_id = colorRepository.findById(itemCreateRequestDto.getColor_id()).orElseThrow();
         Size size_id = sizeRepository.findById(itemCreateRequestDto.getSize_id()).orElseThrow();
-
 
         Item entity = Item.builder()
                 .itemName(itemCreateRequestDto.getItemName())
@@ -69,9 +69,10 @@ public class ItemService {
                 .item(savedItem)
                 .build();
 
+        thumbnail_image.transferTo(new File(getFullPath(createSaveFileName(thumbnail_image.getOriginalFilename()))));
+
         ThumbnailImage thumbnailImageRequestDtoEntity = thumbnailImageRequestDto.toEntity(thumbnailImageRequestDto);
         thumbnailImageRepository.save(thumbnailImageRequestDtoEntity);
-
 
         if (!CollectionUtils.isEmpty(detail_images)) {
             extractFile(detail_images, savedItem);
@@ -93,7 +94,6 @@ public class ItemService {
                 .thumbnailImage(savedItemThumbnailImage)
                 .build();
     }
-
     public List<ItemDto> list(Pageable pageable) {
         Page<Item> items = itemRepository.findAll(pageable);
         List<ItemDto> itemDtoList = new ArrayList<>();
@@ -114,15 +114,11 @@ public class ItemService {
 
             itemDtoList.add(build);
         }
-
         return itemDtoList;
     }
 
     public List<ItemDto> search(ItemSearchConditionDto itemSearchConditionDto, Pageable pageable){
         List<Item> itemList = itemRepository.searchItem(itemSearchConditionDto, pageable);
-
-        log.info("item amount = {}", pageable.getOffset());
-
         List<ItemDto> itemDtoList = new ArrayList<>();
 
         for (Item item : itemList){
@@ -139,16 +135,10 @@ public class ItemService {
                     .thumbnailImage(item.getThumbnailImage())
                     .build();
 
-
             itemDtoList.add(itemDto);
         }
-
         return itemDtoList;
-
-
     }
-
-
 
     public ItemDto detailPage(Map<String, Long> item_id_map) {
         Long itemId = item_id_map.get("item_id");
@@ -171,12 +161,10 @@ public class ItemService {
     public void delete(Map<String, Long> item_id_map) {
         Long item_id = item_id_map.get("item_id");
         Item item = itemRepository.findById(item_id).orElseThrow(
-                () -> new RuntimeException("해당 아이템은 존재하지 않습니다.")
-        );
+                () -> new RuntimeException("해당 아이템은 존재하지 않습니다."));
 
         itemRepository.delete(item);
     }
-
 
     public ItemModifiedResponseDto modified(ItemModifiedRequestDto itemModifiedRequestDto, MultipartFile new_thumbnail_image ,List<MultipartFile> new_detail_images) throws IOException {
         Item item = itemRepository.findById(itemModifiedRequestDto.getId()).orElseThrow(
@@ -206,8 +194,6 @@ public class ItemService {
             thumbnailImageRepository.save(thumbnailImageRequestDto.toEntity(thumbnailImageRequestDto));
             thumbnailImageRepository.flush();
 
-
-
         DetailCategory detailCategory = detailCategoryRepository.findById(itemModifiedRequestDto.getDetailCategory_id()).orElseThrow();
         Category category = categoryRepository.findById(itemModifiedRequestDto.getCategory_id()).orElseThrow();
         Color color = colorRepository.findById(itemModifiedRequestDto.getColor_id()).orElseThrow();
@@ -216,12 +202,11 @@ public class ItemService {
 
         List<DetailImage> exist_detailImages = newItem.getDetailImage();
 
-
         if (CollectionUtils.isEmpty(exist_detailImages) && !CollectionUtils.isEmpty(new_detail_images)){
 
             extractFile(new_detail_images, newItem);
 
-            log.info("케이스 1 : 상세이미지는 없고 파일은 있을때!");
+            log.info("케이스 1 : 현재 저장된 상세이미지는 없고 수정을 위한 상세이미지 파일은 존재할때");
 
             ItemModifiedResponseDto itemModifiedResponseDto = ItemModifiedResponseDto.builder()
                     .id(newItem.getId())
@@ -242,10 +227,9 @@ public class ItemService {
         }
 
         if (!CollectionUtils.isEmpty(exist_detailImages) && CollectionUtils.isEmpty(new_detail_images)) {
-            log.info("케이스 2 : 상세이미지는 있는데 파일은 없을때!");
+            log.info("케이스 2 : 현재 저장된 상세이미지는 있는데 수정을 위한 상세이미지 파일은 존재하지 않을때");
 
             detailImageRepository.deleteByItem_id(newItem.getId());
-
 
             ItemModifiedResponseDto itemModifiedResponseDto = ItemModifiedResponseDto.builder()
                     .id(newItem.getId())
@@ -268,7 +252,7 @@ public class ItemService {
 
         if (!CollectionUtils.isEmpty(exist_detailImages) && !CollectionUtils.isEmpty(new_detail_images)) {
 
-            log.info("케이스 3 : 상세이미지 와 파일 모두 존재 할때");
+            log.info("케이스 3 : 저장된 상세이미지 와 수정을 위한 상세이미지 파일 모두 존재할때");
 
             detailImageRepository.deleteByItem_id(newItem.getId());
 
@@ -326,34 +310,26 @@ public class ItemService {
         item.updateItem(itemModifiedResponseDto);
 
         return itemModifiedResponseDto;
-
     }
-
     private String createSaveFileName (String originalFileName){
             String ext = extractExt(originalFileName);
             String uuid = UUID.randomUUID().toString();
 
             return uuid + "." + ext;
         }
-
         private String extractExt (String originalFileName){
             int index = originalFileName.lastIndexOf(".");
             return originalFileName.substring(index + 1);
-
         }
-
         private String getFullPath (String fileName){
             return fileDir + fileName;
-
         }
-
     public String comma(int value) {
         DecimalFormat df = new DecimalFormat("###,###");
         return df.format(value);
     }
 
-
-
+// 상품 상세 이미지 저장 로직
     private void extractFile(List<MultipartFile> files, Item saveItem) throws IOException {
         for (MultipartFile file : files) {
 

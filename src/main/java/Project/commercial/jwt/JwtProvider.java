@@ -43,7 +43,6 @@ public class JwtProvider {
 
     public Authentication getAuthentication(String token){
         String subject = getEmail(token);
-
         UserDetails userDetails = userDetailService.loadUserByUsername(subject);
         return new UsernamePasswordAuthenticationToken(userDetails,"",null);
 

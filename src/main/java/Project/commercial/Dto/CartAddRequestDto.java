@@ -12,7 +12,4 @@ public class CartAddRequestDto {
     private Long item_id;
 
     private Integer quantity;
-
-
-
 }

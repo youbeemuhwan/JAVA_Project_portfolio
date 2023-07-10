@@ -17,9 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-
 public class OrderListDto {
-
 
     private Long id;
 
@@ -35,7 +33,6 @@ public class OrderListDto {
     private String  paymentMethod;
     @Nullable
     private String orderStatus;
-
 
     public OrderListDto(Long id, String orderNumber, LocalDateTime created_at, List<CartAndOrderItemDto> orderItem, Integer totalPrice, @Nullable String paymentMethod, @Nullable String orderStatus) {
         this.id = id;

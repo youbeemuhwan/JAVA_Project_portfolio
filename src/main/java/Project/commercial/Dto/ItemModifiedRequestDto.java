@@ -14,7 +14,6 @@ import java.util.List;
 
 @Getter
 @Setter
-
 public class ItemModifiedRequestDto {
 
     private Long id;
@@ -32,6 +31,5 @@ public class ItemModifiedRequestDto {
     private Long size_id;
 
     private Integer price;
-
 
 }

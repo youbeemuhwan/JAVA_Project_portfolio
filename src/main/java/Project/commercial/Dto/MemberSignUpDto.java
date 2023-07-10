@@ -11,15 +11,14 @@ public class MemberSignUpDto {
 
     private String email;
 
-
     private String username;
-
 
     private String password;
 
     private Integer point;
 
 
+    @Builder
     public MemberSignUpDto(String email, String username, String password, Integer point) {
         this.email = email;
         this.username = username;

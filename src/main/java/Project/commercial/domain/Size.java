@@ -23,5 +23,4 @@ public class Size {
 
     @NotNull
     private String name;
-
 }

@@ -37,40 +37,43 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .orderBy(item.id.asc())
                 .fetchResults().getResults();
-
     }
 
     private BooleanExpression itemNameContain(String username){
-        if(StringUtils.isNullOrEmpty(username)){
+        if(StringUtils.isNullOrEmpty(username))
+        {
             return null;
         }
-
         return item.itemName.contains(username);
     }
-
     private BooleanExpression detailCategoryEq(Long detailCategory_id){
-        if(detailCategory_id == null){
+        if(detailCategory_id == null)
+        {
             return null;
         }
         return item.detailCategory.id.eq(detailCategory_id);
     }
 
     private BooleanExpression colorEq(Long color_id){
-        if(color_id == null){
+        if(color_id == null)
+        {
             return null;
         }
         return item.color.id.eq(color_id);
     }
 
     private BooleanExpression sizeEq(Long size_id){
-        if(size_id == null){
+        if(size_id == null)
+        {
             return null;
         }
+
         return item.size.id.eq(size_id);
     }
 
     private BooleanExpression categoryEq(Long category_id){
-        if(category_id == null){
+        if(category_id == null)
+        {
             return null;
         }
         return item.category.id.eq(category_id);
@@ -93,7 +96,6 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom{
        if (!(minimum_price == null) && !(max_price == null)){
            return item.price.between(minimum_price, max_price);
        }
-
        return null;
     }
 }

@@ -21,7 +21,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
     private final JwtProvider jwtProvider;
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -29,8 +28,8 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests()
-                .antMatchers("/home", "/member/login","/","/main", "/member/signup", "board/list/**"
-                        ,"board/detail")
+                .antMatchers("/home", "/member/login","/","/main", "/member/signup", "/board/list/**"
+                        ,"/board/detail","/item/list", "/item/detail")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()

@@ -9,13 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board, Long>{
-
     Page<Board> findByTitleContaining(String keyword, Pageable pageable);
-
     Page<Board> findByMember_id(Long id, Pageable pageable);
-
-
-
-
-
 }

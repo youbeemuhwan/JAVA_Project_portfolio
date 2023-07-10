@@ -18,12 +18,9 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final JwtProvider jwtProvider;
 
-
     public Member signUp(MemberSignUpDto memberSignUpDto){
-
 
         if (memberRepository.existsByEmail(memberSignUpDto.getEmail()))
         {
@@ -56,8 +53,5 @@ public class MemberService {
                .username(loginMember.getUsername())
                .token(jwtProvider.createToken(loginMember.getId(), loginMember.getEmail()))
                .build();
-
     }
-
-
 }

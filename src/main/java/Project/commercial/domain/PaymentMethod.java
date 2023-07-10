@@ -18,7 +18,4 @@ public class PaymentMethod {
     private Long id;
 
     private String name;
-
-
-
 }

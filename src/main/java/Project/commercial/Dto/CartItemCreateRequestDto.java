@@ -17,7 +17,6 @@ public class CartItemCreateRequestDto {
     private Item item;
 
     private Integer quantity;
-
     public CartItem toEntity(CartItemCreateRequestDto cartItemCreateRequestDto){
         return CartItem.builder()
                 .item(cartItemCreateRequestDto.getItem())

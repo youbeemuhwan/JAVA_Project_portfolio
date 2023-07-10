@@ -39,7 +39,6 @@ public class Item {
     @NotNull
     private String description;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "color_id")
     private Color color;
@@ -49,18 +48,14 @@ public class Item {
     @JoinColumn(name = "size_id")
     private Size size;
 
-
     @NotNull
     private Integer price;
-
 
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetailImage> detailImage = new ArrayList<>();
 
     @OneToOne(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private ThumbnailImage thumbnailImage;
-
-
 
     @Builder
     public Item(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, Integer price, List<DetailImage> detailImage, ThumbnailImage thumbnailImage) {

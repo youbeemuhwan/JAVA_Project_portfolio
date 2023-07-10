@@ -16,7 +16,6 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DetailCategory {
 
     @Id
