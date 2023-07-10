@@ -14,13 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 
 @Service
@@ -34,7 +32,7 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ItemRepository itemRepository;
 
-    public CartItemDto addItem(CartAddRequestDto cartAddRequestDto, Authentication authentication) {
+    public CartAndOrderItemDto addItem(CartAddRequestDto cartAddRequestDto, Authentication authentication) {
 
         Member member = getMember(authentication);
         Long member_id = member.getId();
@@ -67,8 +65,8 @@ public class CartService {
             cartItemRepository.flush();
             Item existItem = existCartItem.getItem();
 
-            return CartItemDto.builder()
-                    .id(existItem.getId())
+            return CartAndOrderItemDto.builder()
+                    .item_id(existItem.getId())
                     .itemName(existItem.getItemName())
                     .color(existItem.getColor())
                     .size(existItem.getSize())
@@ -83,8 +81,8 @@ public class CartService {
         CartItem savedCartItem = cartItemRepository.save(cartItemEntity);
         Item item = savedCartItem.getItem();
         
-        return CartItemDto.builder()
-                .id(item.getId())
+        return CartAndOrderItemDto.builder()
+                .item_id(item.getId())
                 .itemName(item.getItemName())
                 .color(item.getColor())
                 .size(item.getSize())
@@ -108,13 +106,13 @@ public class CartService {
         cartItem.updateCartItem(cartItemModifiedRequestDto);
 
         List<CartItem> cartItemList = memberCart.getCartItemList();
-        List<CartItemDto> cartItemDtoList = new ArrayList<>();
+        List<CartAndOrderItemDto> cartAndOrderItemDtoList = new ArrayList<>();
         int total_price = 0;
 
         for(CartItem forCartItem : cartItemList){
             Item item = forCartItem.getItem();
-            CartItemDto cartItemDto = CartItemDto.builder()
-                    .id(item.getId())
+            CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
+                    .item_id(item.getId())
                     .itemName(item.getItemName())
                     .color(item.getColor())
                     .size(item.getSize())
@@ -123,12 +121,12 @@ public class CartService {
                     .thumbnailImages(item.getThumbnailImage())
                     .build();
             
-            cartItemDtoList.add(cartItemDto);
+            cartAndOrderItemDtoList.add(cartAndOrderItemDto);
             total_price += item.getPrice() * forCartItem.getQuantity();
         }
 
         CartItemListDto cartItemListDto = CartItemListDto.builder()
-                .CartItemList(cartItemDtoList)
+                .CartItemList(cartAndOrderItemDtoList)
                 .total_price(comma(total_price))
                 .build();
 
@@ -142,13 +140,13 @@ public class CartService {
                 () -> new RuntimeException("카트에 담은 아이템이 존재하지 않습니다."));
 
         List<CartItem> cartItemList = memberCart.getCartItemList();
-        List<CartItemDto> cartItemDtoList = new ArrayList<>();
+        List<CartAndOrderItemDto> cartAndOrderItemDtoList = new ArrayList<>();
         int total_price = 0;
 
         for(CartItem forCartItem : cartItemList){
             Item item = forCartItem.getItem();
-            CartItemDto cartItemDto = CartItemDto.builder()
-                    .id(item.getId())
+            CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
+                    .item_id(item.getId())
                     .itemName(item.getItemName())
                     .color(item.getColor())
                     .size(item.getSize())
@@ -157,12 +155,12 @@ public class CartService {
                     .thumbnailImages(item.getThumbnailImage())
                     .build();
 
-            cartItemDtoList.add(cartItemDto);
+            cartAndOrderItemDtoList.add(cartAndOrderItemDto);
             total_price += item.getPrice() * forCartItem.getQuantity();
         }
 
         CartItemListDto cartItemListDto = CartItemListDto.builder()
-                .CartItemList(cartItemDtoList)
+                .CartItemList(cartAndOrderItemDtoList)
                 .total_price(comma(total_price))
                 .build();
         
