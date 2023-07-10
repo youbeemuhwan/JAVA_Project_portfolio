@@ -14,9 +14,7 @@ import java.util.List;
 @Builder
 public class BoardDto {
 
-
     private Long id;
-
 
     private String title;
 
@@ -25,7 +23,6 @@ public class BoardDto {
     private Integer star_rate;
 
     private LocalDateTime created_at;
-
 
     private LocalDateTime modified_at;
 

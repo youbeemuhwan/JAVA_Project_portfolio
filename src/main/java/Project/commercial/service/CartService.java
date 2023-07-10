@@ -36,26 +36,19 @@ public class CartService {
 
         Member member = getMember(authentication);
         Long member_id = member.getId();
-        
+        // 카트가 없을시 카트 생성
         if (cartRepository.findByMember_id(member_id).isEmpty()) {
             Cart cart = Cart.builder()
                     .member(member)
                     .build();
-
             cartRepository.save(cart);
         }
 
+        Cart findCart = cartRepository.findByMember_id(member_id).orElseThrow();
 
-        Cart cart = cartRepository.findByMember_id(member_id).orElseThrow();
-        
-        CartItemCreateRequestDto cartItemCreateRequestDto = CartItemCreateRequestDto.builder()
-                .cart(cart)
-                .item(itemRepository.findById(cartAddRequestDto.getItem_id()).orElseThrow())
-                .quantity(cartAddRequestDto.getQuantity())
-                .build();
-
-        if (cartItemRepository.findByCartIdAndItemId(cart.getId(), cartItemCreateRequestDto.getItem().getId()).isPresent()) {
-            CartItem existCartItem = cartItemRepository.findByCartIdAndItemId(cart.getId(), cartItemCreateRequestDto.getItem().getId()).orElseThrow();
+// 장바구니에 상품을 담을때 해당 상품이 이미 담겨있다면 담겨있는 아이템의 수량을 추가하는 로직
+        if (cartItemRepository.findByCartIdAndItemId(findCart.getId(), cartAddRequestDto.getItem_id()).isPresent()) {
+            CartItem existCartItem = cartItemRepository.findByCartIdAndItemId(findCart.getId(), cartAddRequestDto.getItem_id()).orElseThrow();
 
             CartItemModifiedRequestDto cartItemModifiedRequestDto = CartItemModifiedRequestDto.builder()
                     .quantity(cartAddRequestDto.getQuantity() + existCartItem.getQuantity())
@@ -75,6 +68,12 @@ public class CartService {
                     .quantity(existCartItem.getQuantity())
                     .build();
         }
+// 카트에 담으려는 상품이 카트 안에 중복으로 존재하지 않는다면 정상적으로 카트 아이템 생성하기
+        CartItemCreateRequestDto cartItemCreateRequestDto = CartItemCreateRequestDto.builder()
+                .cart(findCart)
+                .item(itemRepository.findById(cartAddRequestDto.getItem_id()).orElseThrow())
+                .quantity(cartAddRequestDto.getQuantity())
+                .build();
 
         CartItem cartItemEntity = cartItemCreateRequestDto.toEntity(cartItemCreateRequestDto);
 
@@ -90,9 +89,8 @@ public class CartService {
                 .price(comma(item.getPrice()))
                 .quantity(savedCartItem.getQuantity())
                 .build();
-
     }
-
+// 카트에 담겨져있는 상품 수량 변경 로직
     public CartItemListDto modified(CartItemModifiedRequestDto cartItemModifiedRequestDto, Authentication authentication){
 
         Member member = getMember(authentication);
@@ -125,14 +123,11 @@ public class CartService {
             total_price += item.getPrice() * forCartItem.getQuantity();
         }
 
-        CartItemListDto cartItemListDto = CartItemListDto.builder()
+       return CartItemListDto.builder()
                 .CartItemList(cartAndOrderItemDtoList)
                 .total_price(comma(total_price))
                 .build();
-
-        return cartItemListDto;
     }
-    
     public CartItemListDto list(Authentication authentication){
         Member member = getMember(authentication);
 
@@ -159,21 +154,16 @@ public class CartService {
             total_price += item.getPrice() * forCartItem.getQuantity();
         }
 
-        CartItemListDto cartItemListDto = CartItemListDto.builder()
-                .CartItemList(cartAndOrderItemDtoList)
-                .total_price(comma(total_price))
-                .build();
-        
-        return cartItemListDto;
+        return CartItemListDto.builder()
+                    .CartItemList(cartAndOrderItemDtoList)
+                    .total_price(comma(total_price))
+                    .build();
     }
-    
     public void delete(Map<String, Long> item_id_map, Authentication authentication){
         Long item_id = item_id_map.get("item_id");
         Member member = getMember(authentication);
         Cart memberCart = cartRepository.findByMember_id(member.getId()).orElseThrow(
                 () -> new RuntimeException("잘못된 접근 입니다."));
-
-        log.info("member id = {}", memberCart.getId());
 
         CartItem cartItem = cartItemRepository.findByCartIdAndItemId(memberCart.getId(), item_id).orElseThrow(
                 () -> new RuntimeException("해당 아이템은 존재하지 않습니다."));
@@ -188,8 +178,7 @@ public class CartService {
     }
 
     private Member getMember(Authentication authentication) {
-        Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow();
-        return member;
+        return memberRepository.findByEmail(authentication.getName()).orElseThrow();
     }
 }
 

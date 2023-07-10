@@ -20,27 +20,29 @@ public class CartController {
 
     @PostMapping("/cart/add")
     @ResponseBody
-    public CartAndOrderItemDto addCartItem(@RequestBody CartAddRequestDto cartAddRequestDto, Authentication authentication){
-
+    public CartAndOrderItemDto addCartItem(@RequestBody CartAddRequestDto cartAddRequestDto, Authentication authentication)
+    {
         return cartService.addItem(cartAddRequestDto, authentication);
-
     }
 
     @PatchMapping("/cart/modified")
     @ResponseBody
-    public CartItemListDto modified(@RequestBody CartItemModifiedRequestDto cartItemModifiedRequestDto, Authentication authentication){
+    public CartItemListDto modified(@RequestBody CartItemModifiedRequestDto cartItemModifiedRequestDto, Authentication authentication)
+    {
         return cartService.modified(cartItemModifiedRequestDto, authentication);
     }
 
     @GetMapping("/cart/my_cart")
     @ResponseBody
-    public CartItemListDto myCartList(Authentication authentication){
+    public CartItemListDto myCartList(Authentication authentication)
+    {
         return cartService.list(authentication);
     }
 
     @DeleteMapping("/cart/delete")
     @ResponseBody
-    public String delete(@RequestBody Map<String, Long> item_id_map, Authentication authentication){
+    public String delete(@RequestBody Map<String, Long> item_id_map, Authentication authentication)
+    {
         cartService.delete(item_id_map, authentication);
         return "DELETE DONE";
     }

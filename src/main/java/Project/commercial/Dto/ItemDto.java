@@ -15,7 +15,6 @@ import java.util.List;
 @Builder
 public class ItemDto {
 
-
     private Long id;
 
     private Category category;

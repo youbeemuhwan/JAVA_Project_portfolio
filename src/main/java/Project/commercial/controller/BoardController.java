@@ -27,7 +27,8 @@ public class BoardController {
     public BoardCreateResponseDto create(@RequestPart(value = "BoardCreateRequestDto") BoardCreateRequestDto boardCreateRequestDto,
                                          @Nullable @RequestPart(value = "files", required = false) List<MultipartFile> files
                                          ,Authentication authentication
-                                         ) throws IOException {
+                                         ) throws IOException
+    {
         return boardService.create(boardCreateRequestDto, files ,authentication);
     }
 
@@ -63,16 +64,14 @@ public class BoardController {
                                     @PageableDefault(size=5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
     {
        return boardService.listByMe(authentication, pageable);
-
-
     }
 
     @GetMapping("/board/list/member")
     @ResponseBody
     public List<BoardDto> listByMember(@RequestParam Long member_id,
-                                       @PageableDefault(size=5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+                                       @PageableDefault(size=5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
+    {
         return boardService.listByMember(member_id, pageable);
-
     }
 
     @GetMapping("/board/list/search")
@@ -85,8 +84,8 @@ public class BoardController {
 
     @GetMapping("/board/list/detail")
     @ResponseBody
-    public BoardDto detailPage(@RequestBody Map<String, Long> map_board_id){
+    public BoardDto detailPage(@RequestBody Map<String, Long> map_board_id)
+    {
         return boardService.detailPage(map_board_id);
-
     }
 }

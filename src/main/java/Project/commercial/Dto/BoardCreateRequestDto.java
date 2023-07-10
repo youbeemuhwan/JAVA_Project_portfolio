@@ -11,20 +11,17 @@ import java.time.LocalDateTime;
 @Setter
 public class BoardCreateRequestDto {
 
-
-
     private String title;
 
     private String content;
 
-   private LocalDateTime created_at;
+    private LocalDateTime created_at;
 
-   private LocalDateTime modified_at;
+    private LocalDateTime modified_at;
 
-   private Integer star_rate;
+    private Integer star_rate;
 
     private Member member;
-
 
     public Board toEntity(BoardCreateRequestDto boardCreateRequestDto){
         return Board.builder()

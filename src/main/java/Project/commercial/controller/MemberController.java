@@ -18,16 +18,16 @@ public class MemberController {
 
     @PostMapping("/member/signup")
     @ResponseBody
-    public String signUp(@RequestBody MemberSignUpDto memberSignUpDto){
-
+    public String signUp(@RequestBody MemberSignUpDto memberSignUpDto)
+    {
         memberService.signUp(memberSignUpDto);
 
         return "SIGN UP DONE";
-
     }
     @GetMapping("/member/login")
     @ResponseBody
-    public MemberLoginResponseDto login(@RequestBody MemberLoginRequestDto memberLoginRequestDto){
+    public MemberLoginResponseDto login(@RequestBody MemberLoginRequestDto memberLoginRequestDto)
+    {
         return memberService.login(memberLoginRequestDto);
     }
 

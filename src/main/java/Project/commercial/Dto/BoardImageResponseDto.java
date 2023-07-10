@@ -13,7 +13,6 @@ public class BoardImageResponseDto {
 
     private Long id;
 
-
     private String ImageName;
 
     public BoardImageResponseDto(Long id, String imageName) {

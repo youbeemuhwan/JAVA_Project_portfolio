@@ -34,16 +34,12 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final BoardImageRepository boardImageRepository;
-
-
     @Value("${file.dir}")
     private String fileDir;
-
 
     public BoardCreateResponseDto create(BoardCreateRequestDto boardCreateRequestDto,
                                          List<MultipartFile> files ,
                                          Authentication authentication) throws IOException {
-
 
             LocalDateTime now = LocalDateTime.now();
             boardCreateRequestDto.setCreated_at(now);
@@ -70,7 +66,6 @@ public class BoardService {
                 .boardImageList(boardImageList)
                 .build();
         }
-
 
     public BoardModifiedResponseDto modified(BoardModifiedRequestDto boardModifiedRequestDto, Authentication authentication){
         Long board_id = boardModifiedRequestDto.getId();
@@ -194,7 +189,6 @@ public class BoardService {
         return board;
     }
 
-
     private void extractFiles(List<MultipartFile> files, Board saveBoard) throws IOException {
         for(MultipartFile file : files){
             if(!(file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/png"))){
@@ -203,8 +197,6 @@ public class BoardService {
 
             String originalFilename = file.getOriginalFilename();
             String saveFileName = createSaveFileName(originalFilename);
-
-
             file.transferTo(new File(getFullPath(saveFileName)));
 
             BoardImageRequestDto  boardImageRequestDto = BoardImageRequestDto.builder()
@@ -235,5 +227,4 @@ public class BoardService {
         return fileDir + fileName;
 
     }
-
 }

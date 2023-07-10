@@ -10,6 +10,5 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ItemRepositoryCustom {
-
     List<Item> searchItem(ItemSearchConditionDto itemSearchConditionDto, Pageable pageable);
 }

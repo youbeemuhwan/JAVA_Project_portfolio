@@ -41,12 +41,10 @@ public class Orders {
 
     private PaymentMethod paymentMethod;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_status_id")
 
     private OrderStatus orderStatus;
-
 
     @Builder
     public Orders(String orderNumber, LocalDateTime created_at, Member member, List<OrderItem> orderItem, String address, Integer totalPrice, PaymentMethod paymentMethod, OrderStatus orderStatus) {

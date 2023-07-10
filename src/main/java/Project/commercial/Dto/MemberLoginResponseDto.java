@@ -10,7 +10,6 @@ import lombok.Setter;
 @Builder
 public class MemberLoginResponseDto {
 
-
     private String email;
 
     private String username;

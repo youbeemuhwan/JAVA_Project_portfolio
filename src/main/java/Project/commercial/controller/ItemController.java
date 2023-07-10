@@ -28,34 +28,36 @@ public class ItemController {
     @ResponseBody
     public ItemCreateResponseDto create(@RequestPart ItemCreateRequestDto itemCreateRequestDto,
                                         @RequestPart MultipartFile thumbnail_image,
-                                        @RequestPart(required = false) List<MultipartFile> detail_images) throws IOException {
+                                        @RequestPart(required = false) List<MultipartFile> detail_images) throws IOException
+    {
         return itemService.create(itemCreateRequestDto,thumbnail_image ,detail_images);
     }
 
     @GetMapping("/item/list/detail")
     @ResponseBody
-    public ItemDto detailPage(@RequestBody Map<String, Long> item_id_map){
+    public ItemDto detailPage(@RequestBody Map<String, Long> item_id_map)
+    {
         return itemService.detailPage(item_id_map);
-
     }
 
     @GetMapping("/item/list")
     @ResponseBody
-    public List<ItemDto> list(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public List<ItemDto> list(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
+    {
         return itemService.list(pageable);
     }
 
     @GetMapping("/item/list/search")
     @ResponseBody
-    public List<ItemDto> search(@RequestBody ItemSearchConditionDto itemSearchConditionDto, @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public List<ItemDto> search(@RequestBody ItemSearchConditionDto itemSearchConditionDto, @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
+    {
         return itemService.search(itemSearchConditionDto, pageable);
     }
 
-
-
     @DeleteMapping("/item/delete")
     @ResponseBody
-    public String delete(@RequestBody Map<String, Long> item_id_map){
+    public String delete(@RequestBody Map<String, Long> item_id_map)
+    {
         itemService.delete(item_id_map);
         return "Item Delete Done";
     }
@@ -64,11 +66,9 @@ public class ItemController {
     @ResponseBody
     public ItemModifiedResponseDto modified(@RequestPart ItemModifiedRequestDto itemModifiedRequestDto,
                                             @RequestPart (required = false) MultipartFile new_thumbnail_image,
-                                            @RequestPart(required = false) List<MultipartFile> detail_images ) throws IOException{
-
+                                            @RequestPart(required = false) List<MultipartFile> detail_images ) throws IOException
+    {
        return  itemService.modified(itemModifiedRequestDto,new_thumbnail_image ,detail_images);
-
-
     }
 
     }

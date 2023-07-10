@@ -26,7 +26,6 @@ public class Member {
     @Email(message = "올바른 E-mail 형식이 아닙니다.")
     private String email;
 
-
     @NotNull
     private String username;
 
@@ -39,7 +38,6 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
 
     private List<Board> board = new ArrayList<Board>();
-
 
     @Builder
     public Member(String email, String username, String password, Integer point) {

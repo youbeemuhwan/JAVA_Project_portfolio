@@ -24,7 +24,6 @@ public class Category {
     @NotNull
     private String name;
 
-
     @Builder
     public Category(Long id, String name) {
         this.id = id;

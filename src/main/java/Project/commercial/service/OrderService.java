@@ -115,6 +115,10 @@ public class OrderService {
         Orders nowOrders = orderRepository.save(createOrdersBuild);
         orderRepository.flush();
 
+        if(cartRepository.findByMember_id(member.getId()).isEmpty()){
+            throw new RuntimeException("카트가 존재하지 않습니다.");
+        }
+
         List<CartItem> cartItemsByMember
                 = cartItemRepository.findAllByCartId(cartRepository.findByMember_id(member.getId()).get().getId());
 
@@ -149,12 +153,12 @@ public class OrderService {
 
         createOrdersBuild.updateTotalPrice(total_price);
 
-        if (nowOrders.getPaymentMethod().getName().equals("포인트 결제")){
-
-            if (member.getPoint() < total_price){
+        if (nowOrders.getPaymentMethod().getName().equals("포인트 결제"))
+        {
+            if (member.getPoint() < total_price)
+            {
                 throw new RuntimeException("포인트가 부족합니다.");
             }
-
             int remainingPoint = member.getPoint() - total_price;
             member.updateMemberPoint(remainingPoint);
             nowOrders.updateOrderStatus(orderStatusRepository.findById(2L).orElseThrow());
@@ -178,7 +182,6 @@ public class OrderService {
                 .total_price(comma(total_price))
                 .build();
     }
-
     public List<OrderListDto> orderList(Pageable pageable, Authentication authentication){
         Member member = getMember(authentication);
         Page<Orders> orderListByMember = orderRepository.findAllByMember_id(member.getId(), pageable);

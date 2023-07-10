@@ -25,9 +25,7 @@ public class DetailImage {
     @NotNull
     private String storeImageName;
 
-
     private Long fileSize;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", updatable = false)

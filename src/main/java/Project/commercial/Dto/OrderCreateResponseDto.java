@@ -14,14 +14,20 @@ import java.time.LocalDateTime;
 @Builder
 public class OrderCreateResponseDto {
     private Long order_id;
-    private String order_number;
-    private LocalDateTime created_at;
-    private CartAndOrderItemDto item;
-    private String address;
-    private String total_price;
-    private PaymentMethod paymentMethod;
-    private OrderStatus orderStatus;
 
+    private String order_number;
+
+    private LocalDateTime created_at;
+
+    private CartAndOrderItemDto item;
+
+    private String address;
+
+    private String total_price;
+
+    private PaymentMethod paymentMethod;
+
+    private OrderStatus orderStatus;
 
     public OrderCreateResponseDto(Long order_id, String order_number, LocalDateTime created_at, CartAndOrderItemDto item, String address, String total_price, PaymentMethod paymentMethod, OrderStatus orderStatus) {
         this.order_id = order_id;

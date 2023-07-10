@@ -33,10 +33,7 @@ public class Board {
     @Max(value = 5, message = "리뷰 별점은 최대 5 이하 이어야 합니다.")
     private Integer star_rate;
 
-
     private LocalDateTime created_at;
-
-
     private LocalDateTime modified_at;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,9 +43,6 @@ public class Board {
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardImage> boardImageList;
-
-
-
 
     @Builder
     public Board(String title, String content,Integer star_rate, LocalDateTime created_at, LocalDateTime modified_at, Member member) {

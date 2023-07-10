@@ -2,11 +2,12 @@ package Project.commercial.Dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
 public class ItemCreateRequestDto {
 
     private Long category_id;
@@ -23,9 +24,7 @@ public class ItemCreateRequestDto {
 
     private Integer price;
 
-    public ItemCreateRequestDto() {
-    }
-
+    @Builder
     public ItemCreateRequestDto(Long category_id, Long detailCategory_id, String itemName, String description, Long color_id, Long size_id, Integer price) {
         this.category_id = category_id;
         this.detailCategory_id = detailCategory_id;

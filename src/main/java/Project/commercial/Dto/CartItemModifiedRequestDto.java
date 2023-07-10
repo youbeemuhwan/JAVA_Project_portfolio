@@ -7,7 +7,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 public class CartItemModifiedRequestDto {
 
@@ -15,8 +14,7 @@ public class CartItemModifiedRequestDto {
 
     private Integer quantity;
 
-
-
+    @Builder
     public CartItemModifiedRequestDto(Long cart_item_id, Integer quantity) {
         this.cart_item_id = cart_item_id;
         this.quantity = quantity;
