@@ -48,6 +48,10 @@ public class Member {
         this.password = password;
         this.point = point;
     }
+
+    public void updateMemberPoint(Integer point){
+        this.point = point;
+    }
 }
 
 

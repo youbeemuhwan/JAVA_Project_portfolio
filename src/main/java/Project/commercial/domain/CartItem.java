@@ -22,7 +22,7 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // 오류 발생
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", updatable = false)
     @NotNull
     private Item item;

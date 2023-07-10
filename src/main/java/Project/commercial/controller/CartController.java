@@ -1,8 +1,6 @@
 package Project.commercial.controller;
 
 import Project.commercial.Dto.*;
-import Project.commercial.domain.Cart;
-import Project.commercial.domain.CartItem;
 import Project.commercial.service.CartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -23,7 +20,7 @@ public class CartController {
 
     @PostMapping("/cart/add")
     @ResponseBody
-    public CartItemDto addCartItem(@RequestBody CartAddRequestDto cartAddRequestDto, Authentication authentication){
+    public CartAndOrderItemDto addCartItem(@RequestBody CartAddRequestDto cartAddRequestDto, Authentication authentication){
 
         return cartService.addItem(cartAddRequestDto, authentication);
 
