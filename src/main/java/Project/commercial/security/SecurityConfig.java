@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .cors().and()
                 .authorizeRequests()
                 .antMatchers("/home", "/member/login","/","/main", "/member/signup", "/board/list/**"
-                        ,"/board/detail","/item/list", "/item/detail")
+                        ,"/board/detail","/item/list", "/item/detail","/swagger-ui/**","/swagger-resources/**","/v2/api-docs","/v3/api-docs")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()

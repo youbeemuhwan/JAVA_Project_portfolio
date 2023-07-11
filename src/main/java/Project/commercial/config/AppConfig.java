@@ -1,4 +1,4 @@
-package Project.commercial;
+package Project.commercial.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
