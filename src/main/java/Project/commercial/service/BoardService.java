@@ -7,7 +7,6 @@ import Project.commercial.domain.BoardImage;
 import Project.commercial.domain.Member;
 import Project.commercial.repository.BoardImageRepository;
 import Project.commercial.repository.BoardRepository;
-import Project.commercial.repository.CategoryRepository;
 import Project.commercial.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

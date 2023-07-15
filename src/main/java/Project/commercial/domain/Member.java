@@ -36,7 +36,7 @@ public class Member {
     private Integer point;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-
+    @BatchSize(size = 5)
     private List<Board> board = new ArrayList<Board>();
 
     @Builder

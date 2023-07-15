@@ -1,6 +1,7 @@
 package Project.commercial.Dto;
 
 import Project.commercial.domain.*;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

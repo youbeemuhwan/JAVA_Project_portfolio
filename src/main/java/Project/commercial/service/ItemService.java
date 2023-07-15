@@ -3,20 +3,17 @@ package Project.commercial.service;
 import Project.commercial.Dto.*;
 import Project.commercial.domain.*;
 import Project.commercial.repository.*;
-import com.querydsl.core.QueryResults;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -144,7 +141,9 @@ public class ItemService {
         Long itemId = item_id_map.get("item_id");
         Item item = itemRepository.findById(itemId).orElseThrow();
 
-        return  ItemDto.builder()
+
+
+        ItemDto itemDto = ItemDto.builder()
                 .id(item.getId())
                 .category(item.getCategory())
                 .detailCategory(item.getDetailCategory())
@@ -156,6 +155,9 @@ public class ItemService {
                 .detailImage(item.getDetailImage())
                 .thumbnailImage(item.getThumbnailImage())
                 .build();
+
+
+        return  itemDto;
     }
 
     public void delete(Map<String, Long> item_id_map) {

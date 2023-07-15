@@ -20,7 +20,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    public Member signUp(MemberSignUpDto memberSignUpDto){
+    public void signUp(MemberSignUpDto memberSignUpDto){
 
         if (memberRepository.existsByEmail(memberSignUpDto.getEmail()))
         {
@@ -35,7 +35,7 @@ public class MemberService {
         Member member = memberSignUpDto.toEntity(memberSignUpDto);
 
         memberRepository.save(member);
-        return member;
+
 
     }
 

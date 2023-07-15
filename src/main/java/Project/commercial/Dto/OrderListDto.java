@@ -30,11 +30,12 @@ public class OrderListDto {
     private Integer totalPrice;
 
     @Nullable
-    private String  paymentMethod;
-    @Nullable
-    private String orderStatus;
+    private PaymentMethod  paymentMethod;
 
-    public OrderListDto(Long id, String orderNumber, LocalDateTime created_at, List<CartAndOrderItemDto> orderItem, Integer totalPrice, @Nullable String paymentMethod, @Nullable String orderStatus) {
+    @Nullable
+    private OrderStatus orderStatus;
+
+    public OrderListDto(Long id, String orderNumber, LocalDateTime created_at, List<CartAndOrderItemDto> orderItem, Integer totalPrice, @Nullable PaymentMethod paymentMethod, @Nullable OrderStatus orderStatus) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.created_at = created_at;

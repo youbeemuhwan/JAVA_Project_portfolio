@@ -194,8 +194,8 @@ public class OrderService {
                     .id(order.getId())
                     .orderNumber(order.getOrderNumber())
                     .created_at(order.getCreated_at())
-                    .orderStatus(order.getOrderStatus().getName())
-                    .paymentMethod(order.getPaymentMethod().getName())
+                    .orderStatus(order.getOrderStatus())
+                    .paymentMethod(order.getPaymentMethod())
                     .totalPrice(order.getTotalPrice())
                     .build();
 
@@ -225,7 +225,7 @@ public class OrderService {
     public List<OrderListDto> listByOrderStatus(Map<String, Long> order_status_id_map, Pageable pageable, Authentication authentication){
         Long member_id = getMember(authentication).getId();
         Long order_status_id = order_status_id_map.get("order_status_id");
-        Page<Orders> orderList = orderRepository.findAllByOrderStatus_idAndMember_id(member_id,order_status_id, pageable);
+        Page<Orders> orderList = orderRepository.findAllByMember_idAndOrderStatus_id(member_id,order_status_id, pageable);
 
         List<Orders> orders = orderList.getContent();
 
@@ -237,8 +237,8 @@ public class OrderService {
                     .id(order.getId())
                     .orderNumber(order.getOrderNumber())
                     .created_at(order.getCreated_at())
-                    .orderStatus(order.getOrderStatus().getName())
-                    .paymentMethod(order.getPaymentMethod().getName())
+                    .orderStatus(order.getOrderStatus())
+                    .paymentMethod(order.getPaymentMethod())
                     .totalPrice(order.getTotalPrice())
                     .build();
 

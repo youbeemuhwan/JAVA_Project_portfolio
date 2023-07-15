@@ -3,6 +3,7 @@ package Project.commercial.domain;
 
 import Project.commercial.Dto.ItemModifiedRequestDto;
 import Project.commercial.Dto.ItemModifiedResponseDto;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
