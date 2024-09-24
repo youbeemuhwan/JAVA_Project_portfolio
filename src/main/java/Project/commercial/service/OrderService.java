@@ -1,7 +1,8 @@
 package Project.commercial.service;
 
-import Project.commercial.Dto.*;
 import Project.commercial.domain.*;
+import Project.commercial.dto.cart.CartAndOrderItemDto;
+import Project.commercial.dto.order.*;
 import Project.commercial.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,154 +33,186 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
 
 
-    public OrderCreateResponseDto orderCreate(OrderCreateRequestDto orderCreateRequestDto, Authentication authentication){
+    public OrderCreateResponseDto orderCreate(OrderCreateRequestDto orderCreateRequestDto, Authentication authentication) {
+        Orders newOrder = buildOrder(orderCreateRequestDto, authentication);
+        orderRepository.save(newOrder);
 
-        Orders createOrdersBuild = Orders.builder()
+        handlePaymentMethod(newOrder, orderCreateRequestDto);
+
+        OrderItem newOrderItem = buildOrderItem(newOrder, orderCreateRequestDto);
+        orderItemRepository.save(newOrderItem);
+
+        return buildOrderResponse(newOrder, newOrderItem);
+    }
+
+    private Orders buildOrder(OrderCreateRequestDto orderCreateRequestDto, Authentication authentication) {
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(orderCreateRequestDto.getPaymentMethod_id())
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 결제 수단입니다."));
+
+
+        Item item = itemRepository.findById(orderCreateRequestDto.getItem_id())
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 아이템입니다."));
+
+
+        int totalPrice = item.getPrice() * orderCreateRequestDto.getQuantity();
+
+        return Orders.builder()
                 .member(getMember(authentication))
                 .orderNumber(getOrderNumber())
                 .created_at(LocalDateTime.now())
                 .address(orderCreateRequestDto.getAddress())
-                .paymentMethod(paymentMethodRepository.findById(orderCreateRequestDto.getPaymentMethod_id()).orElseThrow())
-                .totalPrice(itemRepository.findById(orderCreateRequestDto.getItem_id()).orElseThrow().getPrice() * orderCreateRequestDto.getQuantity())
+                .paymentMethod(paymentMethod)
+                .totalPrice(totalPrice)
                 .build();
+    }
+    private void handlePaymentMethod(Orders order, OrderCreateRequestDto orderCreateRequestDto) {
+        PaymentMethod paymentMethod = order.getPaymentMethod();
+        if (paymentMethod.getName().equals("포인트 결제")) {
+            handlePointPayment(order);
+        } else if (paymentMethod.getName().equals("무통장 입금")) {
+            order.updateOrderStatus(orderStatusRepository.findById(1L).orElseThrow());
+        }
+    }
 
-        Orders nowOrders = orderRepository.save(createOrdersBuild);
-        orderRepository.flush();
+    private void handlePointPayment(Orders order) {
+        Member member = memberRepository.findById(order.getMember().getId()).orElseThrow(() ->
+                new IllegalArgumentException("유효하지 않은 회원입니다.")
+        );
+        int nowPoint = member.getPoint();
+        int totalPrice = order.getTotalPrice();
 
-        if(paymentMethodRepository.findById(nowOrders.getPaymentMethod().getId()).orElseThrow().getName().equals("포인트 결제"))
-        {
-            Member nowMember = memberRepository.findById(createOrdersBuild.getMember().getId()).orElseThrow();
-            Integer nowPoint = nowMember.getPoint();
-            Integer totalPrice = nowOrders.getTotalPrice();
-            
-            if(totalPrice > nowPoint){
-                throw new RuntimeException("포인트가 부족합니다.");
-            }
-
-            int remainingPoint = nowPoint - totalPrice;
-
-            nowMember.updateMemberPoint(remainingPoint);
-            createOrdersBuild.updateOrderStatus(orderStatusRepository.findById(2L).orElseThrow());
+        if (totalPrice > nowPoint) {
+            throw new RuntimeException("포인트가 부족합니다.");
         }
 
+        int remainingPoint = nowPoint - totalPrice;
+        member.updateMemberPoint(remainingPoint);
+        order.updateOrderStatus(orderStatusRepository.findById(2L).orElseThrow());
+    }
 
-        if(paymentMethodRepository.findById(nowOrders.getPaymentMethod().getId()).orElseThrow().getName().equals("무통장 입금"))
-        {
-            createOrdersBuild.updateOrderStatus(orderStatusRepository.findById(1L).orElseThrow());
-        }
-
-        OrderItem createOrderItemBuild = OrderItem.builder()
-                .orders(nowOrders)
-                .item(itemRepository.findById(orderCreateRequestDto.getItem_id()).orElseThrow())
+    private OrderItem buildOrderItem(Orders order, OrderCreateRequestDto orderCreateRequestDto) {
+        return OrderItem.builder()
+                .orders(order)
+                .item(itemRepository.findById(orderCreateRequestDto.getItem_id()).orElseThrow(() ->
+                        new IllegalArgumentException("유효하지 않은 아이템입니다.")
+                ))
                 .quantity(orderCreateRequestDto.getQuantity())
-                .build();
-
-        orderItemRepository.save(createOrderItemBuild);
-        orderStatusRepository.flush();
-
-
-        CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
-                .item_id(orderCreateRequestDto.getItem_id())
-                .itemName(createOrderItemBuild.getItem().getItemName())
-                .price(comma(createOrderItemBuild.getItem().getPrice()))
-                .color(createOrderItemBuild.getItem().getColor())
-                .size(createOrderItemBuild.getItem().getSize())
-                .thumbnailImages(createOrderItemBuild.getItem().getThumbnailImage())
-                .quantity(createOrderItemBuild.getQuantity())
-                .build();
-
-        return OrderCreateResponseDto.builder()
-                .order_id(nowOrders.getId())
-                .order_number(nowOrders.getOrderNumber())
-                .created_at(nowOrders.getCreated_at())
-                .item(cartAndOrderItemDto)
-                .address(nowOrders.getAddress())
-                .total_price(comma(nowOrders.getTotalPrice()))
-                .orderStatus(nowOrders.getOrderStatus())
-                .paymentMethod(nowOrders.getPaymentMethod())
                 .build();
     }
 
-    public OrderInCartCreateResponseDto OrderInCartCreate(OrderInCartCreateRequestDto orderInCartCreateRequestDto, Authentication authentication){
+    private OrderCreateResponseDto buildOrderResponse(Orders order, OrderItem orderItem) {
+        CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
+                .item_id(orderItem.getItem().getId())
+                .itemName(orderItem.getItem().getItemName())
+                .price(comma(orderItem.getItem().getPrice()))
+                .color(orderItem.getItem().getColor())
+                .size(orderItem.getItem().getSize())
+                .thumbnailImages(orderItem.getItem().getThumbnailImage())
+                .quantity(orderItem.getQuantity())
+                .build();
 
+        return OrderCreateResponseDto.builder()
+                .order_id(order.getId())
+                .order_number(order.getOrderNumber())
+                .created_at(order.getCreated_at())
+                .item(cartAndOrderItemDto)
+                .address(order.getAddress())
+                .total_price(comma(order.getTotalPrice()))
+                .orderStatus(order.getOrderStatus())
+                .paymentMethod(order.getPaymentMethod())
+                .build();
+    }
+
+    public OrderInCartCreateResponseDto orderInCartCreate(OrderInCartCreateRequestDto orderInCartCreateRequestDto, Authentication authentication) {
         Member member = getMember(authentication);
 
-        Orders createOrdersBuild = Orders.builder()
+        // 주문 생성
+        Orders newOrder = buildOrder(orderInCartCreateRequestDto, member);
+        orderRepository.save(newOrder);
+
+        // 카트 조회 및 비어있으면 예외 처리
+        Cart cart = cartRepository.findByMember_id(member.getId())
+                .orElseThrow(() -> new RuntimeException("해당 회원의 카트가 존재하지 않습니다."));
+        List<CartItem> cartItemsByMember = cartItemRepository.findAllByCartId(cart.getId());
+
+        if (cartItemsByMember.isEmpty()) {
+            throw new RuntimeException("카트가 비어 있습니다.");
+        }
+
+        List<CartAndOrderItemDto> orderItemList = new ArrayList<>();
+        int totalPrice = 0;
+
+        for (CartItem cartItem : cartItemsByMember) {
+            OrderItem orderItem = buildOrderItem(newOrder, cartItem);
+            orderItemRepository.save(orderItem);
+
+            totalPrice += cartItem.getItem().getPrice() * cartItem.getQuantity();
+            orderItemList.add(buildCartAndOrderItemDto(cartItem));
+        }
+
+        newOrder.updateTotalPrice(totalPrice);
+        processPayment(member, newOrder, totalPrice);
+
+        // 카트 삭제
+        cartRepository.deleteByMember_id(member.getId());
+
+        return buildOrderResponse(newOrder, orderItemList, totalPrice);
+    }
+
+    private Orders buildOrder(OrderInCartCreateRequestDto requestDto, Member member) {
+        return Orders.builder()
                 .member(member)
                 .orderNumber(getOrderNumber())
                 .created_at(LocalDateTime.now())
-                .address(orderInCartCreateRequestDto.getAddress())
-                .paymentMethod(paymentMethodRepository.findById(orderInCartCreateRequestDto.getPaymentMethod_id()).orElseThrow())
+                .address(requestDto.getAddress())
+                .paymentMethod(paymentMethodRepository.findById(requestDto.getPaymentMethod_id())
+                        .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 결제 수단입니다.")))
                 .build();
+    }
 
-        Orders nowOrders = orderRepository.save(createOrdersBuild);
-        orderRepository.flush();
+    private OrderItem buildOrderItem(Orders order, CartItem cartItem) {
+        return OrderItem.builder()
+                .orders(order)
+                .item(cartItem.getItem())
+                .quantity(cartItem.getQuantity())
+                .build();
+    }
 
-        if(cartRepository.findByMember_id(member.getId()).isEmpty()){
-            throw new RuntimeException("카트가 존재하지 않습니다.");
-        }
+    private CartAndOrderItemDto buildCartAndOrderItemDto(CartItem cartItem) {
+        return CartAndOrderItemDto.builder()
+                .item_id(cartItem.getItem().getId())
+                .itemName(cartItem.getItem().getItemName())
+                .color(cartItem.getItem().getColor())
+                .size(cartItem.getItem().getSize())
+                .price(comma(cartItem.getItem().getPrice()))
+                .quantity(cartItem.getQuantity())
+                .thumbnailImages(cartItem.getItem().getThumbnailImage())
+                .build();
+    }
 
-        List<CartItem> cartItemsByMember
-                = cartItemRepository.findAllByCartId(cartRepository.findByMember_id(member.getId()).get().getId());
-
-        List<CartAndOrderItemDto> orderItemList = new ArrayList<>();
-        int total_price =0;
-
-        for (CartItem cartItem : cartItemsByMember){
-
-            OrderItem orderItemBuild = OrderItem.builder()
-                    .orders(nowOrders)
-                    .item(cartItem.getItem())
-                    .quantity(cartItem.getQuantity())
-                    .build();
-
-            orderItemRepository.save(orderItemBuild);
-            orderItemRepository.flush();
-
-            total_price += cartItem.getItem().getPrice() * cartItem.getQuantity();
-
-            CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
-                    .item_id(cartItem.getItem().getId())
-                    .itemName(cartItem.getItem().getItemName())
-                    .color(cartItem.getItem().getColor())
-                    .size(cartItem.getItem().getSize())
-                    .price(comma(cartItem.getItem().getPrice()))
-                    .quantity(cartItem.getQuantity())
-                    .thumbnailImages(cartItem.getItem().getThumbnailImage())
-                    .build();
-
-            orderItemList.add(cartAndOrderItemDto);
-        }
-
-        createOrdersBuild.updateTotalPrice(total_price);
-
-        if (nowOrders.getPaymentMethod().getName().equals("포인트 결제"))
-        {
-            if (member.getPoint() < total_price)
-            {
+    private void processPayment(Member member, Orders order, int totalPrice) {
+        if (order.getPaymentMethod().getName().equals("포인트 결제")) {
+            if (member.getPoint() < totalPrice) {
                 throw new RuntimeException("포인트가 부족합니다.");
             }
-            int remainingPoint = member.getPoint() - total_price;
+            int remainingPoint = member.getPoint() - totalPrice;
             member.updateMemberPoint(remainingPoint);
-            nowOrders.updateOrderStatus(orderStatusRepository.findById(2L).orElseThrow());
+            order.updateOrderStatus(orderStatusRepository.findById(2L).orElseThrow());
+        } else if (order.getPaymentMethod().getName().equals("무통장 입금")) {
+            order.updateOrderStatus(orderStatusRepository.findById(1L).orElseThrow());
         }
+    }
 
-        if (nowOrders.getPaymentMethod().getName().equals("무통장 입금")){
-            nowOrders.updateOrderStatus(orderStatusRepository.findById(1L).orElseThrow());
-        }
-
-        cartRepository.deleteByMember_id(member.getId());
-        cartRepository.flush();
-
+    private OrderInCartCreateResponseDto buildOrderResponse(Orders order, List<CartAndOrderItemDto> orderItemList, int totalPrice) {
         return OrderInCartCreateResponseDto.builder()
-                .order_id(nowOrders.getId())
-                .created_at(nowOrders.getCreated_at())
-                .order_number(nowOrders.getOrderNumber())
+                .order_id(order.getId())
+                .created_at(order.getCreated_at())
+                .order_number(order.getOrderNumber())
                 .item_list(orderItemList)
-                .address(nowOrders.getAddress())
-                .paymentMethod(nowOrders.getPaymentMethod())
-                .orderStatus(nowOrders.getOrderStatus())
-                .total_price(comma(total_price))
+                .address(order.getAddress())
+                .paymentMethod(order.getPaymentMethod())
+                .orderStatus(order.getOrderStatus())
+                .total_price(comma(totalPrice))
                 .build();
     }
     public List<OrderListDto> orderList(Pageable pageable, Authentication authentication){
@@ -274,7 +307,6 @@ public class OrderService {
 
     private Member getMember(Authentication authentication) {
         return memberRepository.findByEmail(authentication.getName()).orElseThrow();
-
     }
 
     private String getOrderNumber(){

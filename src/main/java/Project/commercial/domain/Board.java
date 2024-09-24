@@ -1,6 +1,6 @@
 package Project.commercial.domain;
 
-import Project.commercial.Dto.BoardModifiedRequestDto;
+import Project.commercial.dto.board.BoardModifiedRequestDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Builder;

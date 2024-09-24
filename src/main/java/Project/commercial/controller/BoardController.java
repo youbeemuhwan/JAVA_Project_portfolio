@@ -1,5 +1,5 @@
 package Project.commercial.controller;
-import Project.commercial.Dto.*;
+import Project.commercial.dto.board.*;
 import Project.commercial.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +26,7 @@ public class BoardController {
     @ResponseBody
     public BoardCreateResponseDto create(@RequestPart(value = "BoardCreateRequestDto") BoardCreateRequestDto boardCreateRequestDto,
                                          @Nullable @RequestPart(value = "files", required = false) List<MultipartFile> files
-                                         ,Authentication authentication
+                                         , Authentication authentication
                                          ) throws IOException
     {
         return boardService.create(boardCreateRequestDto, files ,authentication);

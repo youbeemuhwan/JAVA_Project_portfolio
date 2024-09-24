@@ -1,6 +1,9 @@
 package Project.commercial.controller;
 
-import Project.commercial.Dto.*;
+import Project.commercial.dto.cart.CartAddRequestDto;
+import Project.commercial.dto.cart.CartAndOrderItemDto;
+import Project.commercial.dto.cart.CartItemListDto;
+import Project.commercial.dto.cart.CartItemModifiedRequestDto;
 import Project.commercial.service.CartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +25,7 @@ public class CartController {
     @ResponseBody
     public CartAndOrderItemDto addCartItem(@RequestBody CartAddRequestDto cartAddRequestDto, Authentication authentication)
     {
-        return cartService.addItem(cartAddRequestDto, authentication);
+        return cartService.addOrUpdateItem(cartAddRequestDto, authentication);
     }
 
     @PatchMapping("/cart/modified")

@@ -1,14 +1,11 @@
 package Project.commercial.domain;
 
 
-import Project.commercial.Dto.ItemModifiedRequestDto;
-import Project.commercial.Dto.ItemModifiedResponseDto;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import Project.commercial.dto.item.ItemModifiedResponseDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.relational.core.sql.In;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

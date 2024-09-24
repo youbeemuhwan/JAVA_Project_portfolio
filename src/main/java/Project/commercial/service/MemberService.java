@@ -1,8 +1,8 @@
 package Project.commercial.service;
 
-import Project.commercial.Dto.MemberLoginRequestDto;
-import Project.commercial.Dto.MemberLoginResponseDto;
-import Project.commercial.Dto.MemberSignUpDto;
+import Project.commercial.dto.member.MemberLoginRequestDto;
+import Project.commercial.dto.member.MemberLoginResponseDto;
+import Project.commercial.dto.member.MemberSignUpDto;
 import Project.commercial.domain.Member;
 import Project.commercial.jwt.JwtProvider;
 import Project.commercial.repository.MemberRepository;

@@ -1,7 +1,7 @@
 package Project.commercial.domain;
 
 
-import Project.commercial.Dto.CartItemModifiedRequestDto;
+import Project.commercial.dto.cart.CartItemModifiedRequestDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Builder;
