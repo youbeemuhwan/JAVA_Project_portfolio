@@ -35,16 +35,16 @@ public class OrdersController {
 
     @DeleteMapping("/order/delete")
     @ResponseBody
-    public String delete(@RequestBody Map<String, Long> order_id_map)
+    public String delete(@RequestBody Map<String, Long> orderIdMap)
     {
-        return orderService.delete(order_id_map);
+        return orderService.delete(orderIdMap);
     }
 
     @PostMapping("/order/cart_order")
     @ResponseBody
-    public OrderInCartCreateResponseDto cart_order_create(@RequestBody OrderInCartCreateRequestDto orderInCartCreateRequestDto, Authentication authentication)
+    public OrderInCartCreateResponseDto createOrderInCart(@RequestBody OrderInCartCreateRequestDto orderInCartCreateRequestDto, Authentication authentication)
     {
-        return orderService.orderInCartCreate(orderInCartCreateRequestDto, authentication);
+        return orderService.createOrderInCart(orderInCartCreateRequestDto, authentication);
     }
 
     @GetMapping("order/my_order/order_status")

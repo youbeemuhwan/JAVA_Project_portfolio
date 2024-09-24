@@ -123,7 +123,7 @@ public class OrderService {
                 .build();
     }
 
-    public OrderInCartCreateResponseDto orderInCartCreate(OrderInCartCreateRequestDto orderInCartCreateRequestDto, Authentication authentication) {
+    public OrderInCartCreateResponseDto createOrderInCart(OrderInCartCreateRequestDto orderInCartCreateRequestDto, Authentication authentication) {
         Member member = getMember(authentication);
 
         // 주문 생성
@@ -298,8 +298,8 @@ public class OrderService {
     }
 
 
-    public String delete(Map<String, Long> order_id_map){
-        Long orderId = order_id_map.get("order_id");
+    public String delete(Map<String, Long> orderIdMap){
+        Long orderId = orderIdMap.get("order_id");
         orderRepository.deleteById(orderId);
         return "DELETE DONE";
     }
