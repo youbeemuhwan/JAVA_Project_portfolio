@@ -1,6 +1,5 @@
 # 의류 커머셜 사이트 프로젝트
 
-http://localhost:8080/swagger-ui/index.html - Swagger API 문서
 
 Skill - Java, Spring Boot, JPA, Qeurydsl, Mysql, Spring Security
 
