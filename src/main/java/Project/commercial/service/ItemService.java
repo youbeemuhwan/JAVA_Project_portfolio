@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class ItemService {
 
@@ -36,7 +35,7 @@ public class ItemService {
     private final ThumbnailImageRepository thumbnailImageRepository;
     @Value("$(file.dir)")
     String fileDir;
-
+    @Transactional
     public ItemCreateResponseDto create(ItemCreateRequestDto itemCreateRequestDto, MultipartFile thumbnailImage, List<MultipartFile> detailImages) throws IOException {
         validateThumbnailImage(thumbnailImage);
 
@@ -65,7 +64,7 @@ public class ItemService {
                 .detailImage(newItem.getDetailImage())
                 .build();
     }
-
+    @Transactional(readOnly = true)
     public List<ItemDto> list(Pageable pageable) {
         Page<Item> items = itemRepository.findAll(pageable);
         return items.stream()
@@ -82,7 +81,7 @@ public class ItemService {
                         .build())
                 .collect(Collectors.toList());
     }
-
+    @Transactional(readOnly = true)
     public List<ItemDto> search(ItemSearchConditionDto itemSearchConditionDto, Pageable pageable) {
         List<Item> itemList = itemRepository.searchItem(itemSearchConditionDto, pageable);
         return itemList.stream()
@@ -100,6 +99,7 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ItemDto detailPage(Map<String, Long> item_id_map) {
         Long itemId = item_id_map.get("item_id");
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
@@ -117,7 +117,7 @@ public class ItemService {
                 .detailImage(item.getDetailImage())
                 .build();
     }
-
+    @Transactional
     public void delete(Map<String, Long> item_id_map) {
         Long itemId = item_id_map.get("item_id");
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
@@ -125,6 +125,7 @@ public class ItemService {
         itemRepository.delete(item);
     }
 
+    @Transactional
     public ItemModifiedResponseDto modified(ItemModifiedRequestDto itemModifiedRequestDto, MultipartFile newThumbnailImage, List<MultipartFile> newDetailImages) throws IOException {
         Item item = itemRepository.findById(itemModifiedRequestDto.getId()).orElseThrow(() -> new RuntimeException("Item not found"));
 
@@ -177,7 +178,7 @@ public class ItemService {
                 .build();
     }
 
-    // Helper methods
+
 
     private ThumbnailImage saveThumbnailImage(MultipartFile thumbnailImage, Item item) throws IOException {
         String savedFileName = createSaveFileName(thumbnailImage.getOriginalFilename());

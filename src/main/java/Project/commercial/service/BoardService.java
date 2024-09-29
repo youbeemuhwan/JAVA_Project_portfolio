@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+
 @Slf4j
 
 public class BoardService {
@@ -40,7 +40,7 @@ public class BoardService {
     private final BoardImageRepository boardImageRepository;
     @Value("${file.dir}")
     private String fileDir;
-
+    @Transactional
     public BoardCreateResponseDto create(BoardCreateRequestDto boardCreateRequestDto,
                                          List<MultipartFile> files ,
                                          Authentication authentication) throws IOException {
@@ -72,7 +72,7 @@ public class BoardService {
                 .boardImageList(boardImageList)
                 .build();
         }
-
+    @Transactional
     public BoardModifiedResponseDto modified(BoardModifiedRequestDto boardModifiedRequestDto, Authentication authentication){
         Long board_id = boardModifiedRequestDto.getId();
         Board board = getBoardAuthority(board_id, authentication);
@@ -89,20 +89,20 @@ public class BoardService {
                 .build();
     }
 
-
+    @Transactional
     public void delete(Map<String, Long> board_id_map, Authentication authentication){
         Long board_id = board_id_map.get("board_id");
         Board board = getBoardAuthority(board_id, authentication);
 
         boardRepository.delete(board);
     }
-
+    @Transactional(readOnly = true)
     public List<BoardDto> listByMember(Long member_id, Pageable pageable){
         Page<Board> boardList = boardRepository.findByMember_id(member_id, pageable);
         return getBoardList(boardList);
     }
 
-
+    @Transactional(readOnly = true)
     public List<BoardDto> listByMe(Authentication authentication,Pageable pageable){
         Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(
                 () -> (new EntityNotFoundException("잘못된 접근입니다.")));
@@ -110,13 +110,13 @@ public class BoardService {
         Page<Board> findBoards = boardRepository.findByMember_id(member.getId(), pageable);
         return getBoardList(findBoards);
     }
-
+    @Transactional(readOnly = true)
     public List<BoardDto> search(String keyword, Pageable pageable){
         Page<Board> findBoards = boardRepository.findByTitleContaining(keyword, pageable);
         return getBoardList(findBoards);
 
     }
-
+    @Transactional(readOnly = true)
     public BoardDto detailPage(Map<String, Long> map_board_id){
 
         Long board_id = map_board_id.get("board_id");
