@@ -10,7 +10,7 @@ import lombok.Setter;
 @Builder
 public class CartAndOrderItemDto {
 
-    private Long item_id;
+    private Long itemId;
 
     private String itemName;
 
@@ -26,8 +26,8 @@ public class CartAndOrderItemDto {
 
 
 
-    public CartAndOrderItemDto(Long item_id, String itemName, Color color, Size size, String price, Integer quantity, ThumbnailImage thumbnailImages) {
-        this.item_id = item_id;
+    public CartAndOrderItemDto(Long itemId, String itemName, Color color, Size size, String price, Integer quantity, ThumbnailImage thumbnailImages) {
+        this.itemId = itemId;
         this.itemName = itemName;
         this.color = color;
         this.size = size;

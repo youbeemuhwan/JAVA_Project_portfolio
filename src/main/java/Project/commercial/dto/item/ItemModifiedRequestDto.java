@@ -10,17 +10,17 @@ public class ItemModifiedRequestDto {
 
     private Long id;
 
-    private Long category_id;
+    private Long categoryId;
 
-    private Long detailCategory_id;
+    private Long detailCategoryId;
 
     private String itemName;
 
     private String description;
 
-    private Long color_id;
+    private Long colorId;
 
-    private Long size_id;
+    private Long sizeId;
 
     private Integer price;
 

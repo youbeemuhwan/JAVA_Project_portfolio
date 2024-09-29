@@ -9,8 +9,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface DetailImageRepository extends JpaRepository<DetailImage, Long> {
-    List<DetailImage> findAllByItem_id(Long item_id);
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query(value = "delete from detail_image d where d.item_id =:item_id", nativeQuery = true)
-    void deleteByItem_id(@Param("item_id") Long item_id);
+    List<DetailImage> findAllByItemId(Long item_id);
+    @Modifying()
+    @Query(value = "delete from detail_image d where d.item_id =:itemId", nativeQuery = true)
+    void deleteByItemId(@Param("itemId") Long itemId);
 }

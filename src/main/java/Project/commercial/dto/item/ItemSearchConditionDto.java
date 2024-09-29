@@ -12,36 +12,34 @@ import org.springframework.lang.Nullable;
 public class ItemSearchConditionDto {
 
     @Nullable
-    private Long category_id;
+    private Long categoryId;
 
     @Nullable
-    private Long detailCategory_id;
+    private Long detailCategoryId;
 
     @Nullable
     private String itemName;
 
     @Nullable
-    private Long color_id;
+    private Long colorId;
 
     @Nullable
-    private Long size_id;
+    private Long sizeId;
 
     @Nullable
-    private Integer minimum_amount;
+    private Integer minimumAmount;
 
     @Nullable
-    private Integer max_amount;
+    private Integer maxAmount;
 
-    public ItemSearchConditionDto() {
-    }
 
-    public ItemSearchConditionDto(Long category_id, Long detailCategory_id, String itemName, Long color_id, Long size_id, Integer minimum_amount, Integer max_amount) {
-        this.category_id = category_id;
-        this.detailCategory_id = detailCategory_id;
+    public ItemSearchConditionDto(Long categoryId, Long detailCategoryId, String itemName, Long colorId, Long sizeId, Integer minimumAmount, Integer maxAmount) {
+        this.categoryId = categoryId;
+        this.detailCategoryId = detailCategoryId;
         this.itemName = itemName;
-        this.color_id = color_id;
-        this.size_id = size_id;
-        this.minimum_amount = minimum_amount;
-        this.max_amount = max_amount;
+        this.colorId = colorId;
+        this.sizeId = sizeId;
+        this.minimumAmount = minimumAmount;
+        this.maxAmount = maxAmount;
     }
 }

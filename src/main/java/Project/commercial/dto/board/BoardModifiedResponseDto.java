@@ -16,15 +16,15 @@ public class BoardModifiedResponseDto {
 
     private String content;
 
-    private Integer star_rate;
+    private Integer starRate;
 
-    private LocalDateTime modified_at;
+    private LocalDateTime modifiedAt;
 
-    public BoardModifiedResponseDto(Long id, String title, String content,Integer star_rate ,LocalDateTime modified_at) {
+    public BoardModifiedResponseDto(Long id, String title, String content, Integer starRate, LocalDateTime modifiedAt) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.star_rate = star_rate;
-        this.modified_at = modified_at;
+        this.starRate = starRate;
+        this.modifiedAt = modifiedAt;
     }
 }

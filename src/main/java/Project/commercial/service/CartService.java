@@ -20,7 +20,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 
 @Service
@@ -43,19 +42,18 @@ public class CartService {
         Cart cart = getOrCreateCart(memberId, member);
 
         // 카트에 상품이 이미 담겨있는지 확인
-        Optional<CartItem> optionalCartItem = cartItemRepository.findByCartIdAndItemId(cart.getId(), cartAddRequestDto.getItem_id());
+        CartItem cartItem = cartItemRepository.findByCartIdAndItemId(cart.getId(), cartAddRequestDto.getItemId()).orElse(null);
 
         // 상품이 이미 담겨있다면 수량을 업데이트
-        if (optionalCartItem.isPresent()) {
-            CartItem existingCartItem = optionalCartItem.get();
-            int newQuantity = cartAddRequestDto.getQuantity() + existingCartItem.getQuantity();
-            return updateCartItem(existingCartItem, newQuantity);
+        if (cartItem != null) {
+            int newQuantity = cartAddRequestDto.getQuantity() + cartItem.getQuantity();
+            return updateCartItem(cartItem, newQuantity);
         }
 
         // 상품이 카트에 없으면 새로운 아이템 추가
         CartItemCreateRequestDto cartItemCreateRequestDto = CartItemCreateRequestDto.builder()
                 .cart(cart)
-                .item(itemRepository.findById(cartAddRequestDto.getItem_id()).orElseThrow())
+                .item(itemRepository.findById(cartAddRequestDto.getItemId()).orElseThrow())
                 .quantity(cartAddRequestDto.getQuantity())
                 .build();
 
@@ -64,7 +62,7 @@ public class CartService {
         Item item = savedCartItem.getItem();
 
         return CartAndOrderItemDto.builder()
-                .item_id(item.getId())
+                .itemId(item.getId())
                 .itemName(item.getItemName())
                 .color(item.getColor())
                 .size(item.getSize())
@@ -76,7 +74,7 @@ public class CartService {
 
     // 카트가 없으면 생성하는 메서드
     private Cart getOrCreateCart(Long memberId, Member member) {
-        return cartRepository.findByMember_id(memberId)
+        return cartRepository.findByMemberId(memberId)
                 .orElseGet(() -> {
                     Cart cart = Cart.builder()
                             .member(member)
@@ -95,7 +93,7 @@ public class CartService {
         Item existItem = existingCartItem.getItem();
 
         return CartAndOrderItemDto.builder()
-                .item_id(existItem.getId())
+                .itemId(existItem.getId())
                 .itemName(existItem.getItemName())
                 .color(existItem.getColor())
                 .size(existItem.getSize())
@@ -107,10 +105,10 @@ public class CartService {
     @Transactional
     public CartItemListDto modified(CartItemModifiedRequestDto cartItemModifiedRequestDto, Authentication authentication) {
         Member member = getMember(authentication);
-        Cart memberCart = cartRepository.findByMember_id(member.getId()).orElseThrow(
+        Cart memberCart = cartRepository.findByMemberId(member.getId()).orElseThrow(
                 () -> new EntityNotFoundException("카트를 찾을 수 없습니다."));
 
-        CartItem cartItem = cartItemRepository.findByCartIdAndItemId(memberCart.getId(), cartItemModifiedRequestDto.getCart_item_id()).orElseThrow(
+        CartItem cartItem = cartItemRepository.findByCartIdAndItemId(memberCart.getId(), cartItemModifiedRequestDto.getCartItemId()).orElseThrow(
                 () -> new EntityNotFoundException("카트에 해당 상품이 존재하지 않습니다."));
 
         cartItem.updateCartItem(cartItemModifiedRequestDto);
@@ -121,13 +119,13 @@ public class CartService {
 
         return CartItemListDto.builder()
                 .cartItemList(cartAndOrderItemDtoList)
-                .total_price(comma(totalPrice))
+                .totalPrice(comma(totalPrice))
                 .build();
     }
     @Transactional(readOnly = true)
     public CartItemListDto list(Authentication authentication) {
         Member member = getMember(authentication);
-        Cart memberCart = cartRepository.findByMember_id(member.getId()).orElseThrow(
+        Cart memberCart = cartRepository.findByMemberId(member.getId()).orElseThrow(
                 () -> new EntityNotFoundException("카트에 담은 아이템이 존재하지 않습니다."));
 
         List<CartItem> cartItemList = memberCart.getCartItemList();
@@ -136,7 +134,7 @@ public class CartService {
 
         return CartItemListDto.builder()
                 .cartItemList(cartAndOrderItemDtoList)
-                .total_price(comma(totalPrice))
+                .totalPrice(comma(totalPrice))
                 .build();
     }
 
@@ -144,7 +142,7 @@ public class CartService {
     public void delete(Map<String, Long> itemIdMap, Authentication authentication) {
         Long itemId = itemIdMap.get("item_id");
         Member member = getMember(authentication);
-        Cart memberCart = cartRepository.findByMember_id(member.getId()).orElseThrow(
+        Cart memberCart = cartRepository.findByMemberId(member.getId()).orElseThrow(
                 () -> new EntityNotFoundException("카트를 찾을 수 없습니다."));
 
         CartItem cartItem = cartItemRepository.findByCartIdAndItemId(memberCart.getId(), itemId).orElseThrow(
@@ -160,7 +158,7 @@ public class CartService {
         for (CartItem cartItem : cartItemList) {
             Item item = cartItem.getItem();
             CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
-                    .item_id(item.getId())
+                    .itemId(item.getId())
                     .itemName(item.getItemName())
                     .color(item.getColor())
                     .size(item.getSize())

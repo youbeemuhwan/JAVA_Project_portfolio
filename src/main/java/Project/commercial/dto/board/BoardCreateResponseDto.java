@@ -19,23 +19,23 @@ public class BoardCreateResponseDto {
 
     private String content;
 
-    private Integer star_rate;
+    private Integer starRate;
 
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
-    private LocalDateTime modified_at;
+    private LocalDateTime modifiedAt;
 
     private String username;
 
     private List<BoardImage> boardImageList;
 
-    public BoardCreateResponseDto(Long id, String title, String content, Integer star_rate, LocalDateTime created_at, LocalDateTime modified_at, String username, List<BoardImage> boardImageList) {
+    public BoardCreateResponseDto(Long id, String title, String content, Integer starRate, LocalDateTime createdAt, LocalDateTime modifiedAt, String username, List<BoardImage> boardImageList) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.star_rate = star_rate;
-        this.created_at = created_at;
-        this.modified_at = modified_at;
+        this.starRate = starRate;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
         this.username = username;
         this.boardImageList = boardImageList;
     }

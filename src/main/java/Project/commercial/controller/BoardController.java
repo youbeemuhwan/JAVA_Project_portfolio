@@ -84,8 +84,8 @@ public class BoardController {
 
     @GetMapping("/board/list/detail")
     @ResponseBody
-    public BoardDto detailPage(@RequestBody Map<String, Long> map_board_id)
+    public BoardDto detailPage(@RequestBody Map<String, Long> boardIdMap)
     {
-        return boardService.detailPage(map_board_id);
+        return boardService.detailPage(boardIdMap);
     }
 }

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class CartAddRequestDto {
 
-    private Long item_id;
+    private Long itemId;
 
     private Integer quantity;
 }

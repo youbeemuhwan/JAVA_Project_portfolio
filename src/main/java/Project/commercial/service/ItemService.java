@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -39,10 +40,10 @@ public class ItemService {
     public ItemCreateResponseDto create(ItemCreateRequestDto itemCreateRequestDto, MultipartFile thumbnailImage, List<MultipartFile> detailImages) throws IOException {
         validateThumbnailImage(thumbnailImage);
 
-        DetailCategory detailCategory = findByIdOrThrow(detailCategoryRepository, itemCreateRequestDto.getDetailCategory_id(), "Invalid Detail Category ID");
-        Category category = findByIdOrThrow(categoryRepository, itemCreateRequestDto.getCategory_id(), "Invalid Category ID");
-        Color color = findByIdOrThrow(colorRepository, itemCreateRequestDto.getColor_id(), "Invalid Color ID");
-        Size size = findByIdOrThrow(sizeRepository, itemCreateRequestDto.getSize_id(), "Invalid Size ID");
+        DetailCategory detailCategory = findByIdOrThrow(detailCategoryRepository, itemCreateRequestDto.getDetailCategoryId(), "Invalid Detail Category ID");
+        Category category = findByIdOrThrow(categoryRepository, itemCreateRequestDto.getCategoryId(), "Invalid Category ID");
+        Color color = findByIdOrThrow(colorRepository, itemCreateRequestDto.getColorId(), "Invalid Color ID");
+        Size size = findByIdOrThrow(sizeRepository, itemCreateRequestDto.getSizeId(), "Invalid Size ID");
 
         Item newItem = createNewItem(itemCreateRequestDto, detailCategory, category, color, size);
         ThumbnailImage thumbnailImageEntity = saveThumbnailImage(thumbnailImage, newItem);
@@ -61,7 +62,7 @@ public class ItemService {
                 .size(newItem.getSize())
                 .price(comma(newItem.getPrice()))
                 .thumbnailImage(thumbnailImageEntity)
-                .detailImage(newItem.getDetailImage())
+                .detailImages(newItem.getDetailImage())
                 .build();
     }
     @Transactional(readOnly = true)
@@ -82,9 +83,10 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
     @Transactional(readOnly = true)
-    public List<ItemDto> search(ItemSearchConditionDto itemSearchConditionDto, Pageable pageable) {
+    public ItemSearchResponseDto search(ItemSearchConditionDto itemSearchConditionDto, Pageable pageable) {
         List<Item> itemList = itemRepository.searchItem(itemSearchConditionDto, pageable);
-        return itemList.stream()
+        Long totalItemCount = itemRepository.getSearchItemCount(itemSearchConditionDto);
+        List<ItemDto> itemDtoList = itemList.stream()
                 .map(item -> ItemDto.builder()
                         .id(item.getId())
                         .category(item.getCategory())
@@ -97,12 +99,17 @@ public class ItemService {
                         .thumbnailImage(item.getThumbnailImage())
                         .build())
                 .collect(Collectors.toList());
+
+        return ItemSearchResponseDto.builder()
+                .item(itemDtoList)
+                .totalCount(totalItemCount)
+                .build();
     }
 
     @Transactional(readOnly = true)
     public ItemDto detailPage(Map<String, Long> item_id_map) {
         Long itemId = item_id_map.get("item_id");
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품 입니다."));
 
         return ItemDto.builder()
                 .id(item.getId())
@@ -114,20 +121,20 @@ public class ItemService {
                 .color(item.getColor())
                 .price(comma(item.getPrice()))
                 .thumbnailImage(item.getThumbnailImage())
-                .detailImage(item.getDetailImage())
+                .detailImages(item.getDetailImage())
                 .build();
     }
     @Transactional
     public void delete(Map<String, Long> item_id_map) {
         Long itemId = item_id_map.get("item_id");
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품 입니다."));
 
         itemRepository.delete(item);
     }
 
     @Transactional
     public ItemModifiedResponseDto modified(ItemModifiedRequestDto itemModifiedRequestDto, MultipartFile newThumbnailImage, List<MultipartFile> newDetailImages) throws IOException {
-        Item item = itemRepository.findById(itemModifiedRequestDto.getId()).orElseThrow(() -> new RuntimeException("Item not found"));
+        Item item = itemRepository.findById(itemModifiedRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품 입니다."));
 
         validateThumbnailImage(newThumbnailImage);
 
@@ -142,14 +149,14 @@ public class ItemService {
         if (CollectionUtils.isEmpty(existingDetailImages) && !CollectionUtils.isEmpty(newDetailImages)) {
             saveDetailImages(newDetailImages, item);
         } else if (!CollectionUtils.isEmpty(existingDetailImages) && !CollectionUtils.isEmpty(newDetailImages)) {
-            detailImageRepository.deleteByItem_id(item.getId());
+            detailImageRepository.deleteByItemId(item.getId());
             saveDetailImages(newDetailImages, item);
         }
 
-        DetailCategory detailCategory = findByIdOrThrow(detailCategoryRepository, itemModifiedRequestDto.getDetailCategory_id(), "Invalid Detail Category ID");
-        Category category = findByIdOrThrow(categoryRepository, itemModifiedRequestDto.getCategory_id(), "Invalid Category ID");
-        Color color = findByIdOrThrow(colorRepository, itemModifiedRequestDto.getColor_id(), "Invalid Color ID");
-        Size size = findByIdOrThrow(sizeRepository, itemModifiedRequestDto.getSize_id(), "Invalid Size ID");
+        DetailCategory detailCategory = findByIdOrThrow(detailCategoryRepository, itemModifiedRequestDto.getDetailCategoryId(), "Invalid Detail Category ID");
+        Category category = findByIdOrThrow(categoryRepository, itemModifiedRequestDto.getCategoryId(), "Invalid Category ID");
+        Color color = findByIdOrThrow(colorRepository, itemModifiedRequestDto.getColorId(), "Invalid Color ID");
+        Size size = findByIdOrThrow(sizeRepository, itemModifiedRequestDto.getSizeId(), "Invalid Size ID");
 
         item.updateItem(ItemModifiedResponseDto.builder()
                 .id(item.getId())
@@ -161,7 +168,7 @@ public class ItemService {
                 .color(color)
                 .price(itemModifiedRequestDto.getPrice())
                 .thumbnailImage(thumbnailImageEntity)
-                .detailImage(detailImageRepository.findAllByItem_id(item.getId()))
+                .detailImages(detailImageRepository.findAllByItemId(item.getId()))
                 .build());
 
         return ItemModifiedResponseDto.builder()
@@ -174,7 +181,7 @@ public class ItemService {
                 .color(color)
                 .price(itemModifiedRequestDto.getPrice())
                 .thumbnailImage(thumbnailImageEntity)
-                .detailImage(detailImageRepository.findAllByItem_id(item.getId()))
+                .detailImages(detailImageRepository.findAllByItemId(item.getId()))
                 .build();
     }
 

@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface ItemRepositoryCustom {
     List<Item> searchItem(ItemSearchConditionDto itemSearchConditionDto, Pageable pageable);
+
+    Long getSearchItemCount(ItemSearchConditionDto itemSearchConditionDto);
 }

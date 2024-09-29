@@ -46,11 +46,11 @@ public class OrderService {
     }
 
     private Orders buildOrder(OrderCreateRequestDto orderCreateRequestDto, Authentication authentication) {
-        PaymentMethod paymentMethod = paymentMethodRepository.findById(orderCreateRequestDto.getPaymentMethod_id())
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(orderCreateRequestDto.getPaymentMethodId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 결제 수단입니다."));
 
 
-        Item item = itemRepository.findById(orderCreateRequestDto.getItem_id())
+        Item item = itemRepository.findById(orderCreateRequestDto.getItemId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 아이템입니다."));
 
 
@@ -59,7 +59,7 @@ public class OrderService {
         return Orders.builder()
                 .member(getMember(authentication))
                 .orderNumber(getOrderNumber())
-                .created_at(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .address(orderCreateRequestDto.getAddress())
                 .paymentMethod(paymentMethod)
                 .totalPrice(totalPrice)
@@ -93,7 +93,7 @@ public class OrderService {
     private OrderItem buildOrderItem(Orders order, OrderCreateRequestDto orderCreateRequestDto) {
         return OrderItem.builder()
                 .orders(order)
-                .item(itemRepository.findById(orderCreateRequestDto.getItem_id()).orElseThrow(() ->
+                .item(itemRepository.findById(orderCreateRequestDto.getItemId()).orElseThrow(() ->
                         new IllegalArgumentException("유효하지 않은 아이템입니다.")
                 ))
                 .quantity(orderCreateRequestDto.getQuantity())
@@ -102,7 +102,7 @@ public class OrderService {
 
     private OrderCreateResponseDto buildOrderResponse(Orders order, OrderItem orderItem) {
         CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
-                .item_id(orderItem.getItem().getId())
+                .itemId(orderItem.getItem().getId())
                 .itemName(orderItem.getItem().getItemName())
                 .price(comma(orderItem.getItem().getPrice()))
                 .color(orderItem.getItem().getColor())
@@ -114,7 +114,7 @@ public class OrderService {
         return OrderCreateResponseDto.builder()
                 .order_id(order.getId())
                 .order_number(order.getOrderNumber())
-                .created_at(order.getCreated_at())
+                .created_at(order.getCreatedAt())
                 .item(cartAndOrderItemDto)
                 .address(order.getAddress())
                 .total_price(comma(order.getTotalPrice()))
@@ -131,7 +131,7 @@ public class OrderService {
         orderRepository.save(newOrder);
 
         // 카트 조회 및 비어있으면 예외 처리
-        Cart cart = cartRepository.findByMember_id(member.getId())
+        Cart cart = cartRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> new RuntimeException("해당 회원의 카트가 존재하지 않습니다."));
         List<CartItem> cartItemsByMember = cartItemRepository.findAllByCartId(cart.getId());
 
@@ -154,7 +154,7 @@ public class OrderService {
         processPayment(member, newOrder, totalPrice);
 
         // 카트 삭제
-        cartRepository.deleteByMember_id(member.getId());
+        cartRepository.deleteByMemberId(member.getId());
 
         return buildOrderResponse(newOrder, orderItemList, totalPrice);
     }
@@ -163,9 +163,9 @@ public class OrderService {
         return Orders.builder()
                 .member(member)
                 .orderNumber(getOrderNumber())
-                .created_at(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .address(requestDto.getAddress())
-                .paymentMethod(paymentMethodRepository.findById(requestDto.getPaymentMethod_id())
+                .paymentMethod(paymentMethodRepository.findById(requestDto.getPaymentMethodId())
                         .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 결제 수단입니다.")))
                 .build();
     }
@@ -180,7 +180,7 @@ public class OrderService {
 
     private CartAndOrderItemDto buildCartAndOrderItemDto(CartItem cartItem) {
         return CartAndOrderItemDto.builder()
-                .item_id(cartItem.getItem().getId())
+                .itemId(cartItem.getItem().getId())
                 .itemName(cartItem.getItem().getItemName())
                 .color(cartItem.getItem().getColor())
                 .size(cartItem.getItem().getSize())
@@ -205,14 +205,14 @@ public class OrderService {
 
     private OrderInCartCreateResponseDto buildOrderResponse(Orders order, List<CartAndOrderItemDto> orderItemList, int totalPrice) {
         return OrderInCartCreateResponseDto.builder()
-                .order_id(order.getId())
-                .created_at(order.getCreated_at())
-                .order_number(order.getOrderNumber())
-                .item_list(orderItemList)
+                .orderId(order.getId())
+                .createdAt(order.getCreatedAt())
+                .orderNumber(order.getOrderNumber())
+                .itemList(orderItemList)
                 .address(order.getAddress())
                 .paymentMethod(order.getPaymentMethod())
                 .orderStatus(order.getOrderStatus())
-                .total_price(comma(totalPrice))
+                .totalPrice(comma(totalPrice))
                 .build();
     }
     public List<OrderListDto> orderList(Pageable pageable, Authentication authentication){
@@ -226,7 +226,7 @@ public class OrderService {
             OrderListDto orderListDto = OrderListDto.builder()
                     .id(order.getId())
                     .orderNumber(order.getOrderNumber())
-                    .created_at(order.getCreated_at())
+                    .createdAt(order.getCreatedAt())
                     .orderStatus(order.getOrderStatus())
                     .paymentMethod(order.getPaymentMethod())
                     .totalPrice(order.getTotalPrice())
@@ -237,7 +237,7 @@ public class OrderService {
                 Item item = orderItem.getItem();
 
                 CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
-                        .item_id(item.getId())
+                        .itemId(item.getId())
                         .itemName(item.getItemName())
                         .color(item.getColor())
                         .size(item.getSize())
@@ -255,10 +255,10 @@ public class OrderService {
     }
 
 
-    public List<OrderListDto> listByOrderStatus(Map<String, Long> order_status_id_map, Pageable pageable, Authentication authentication){
+    public List<OrderListDto> listByOrderStatus(Map<String, Long> orderStatusIdMap, Pageable pageable, Authentication authentication){
         Long member_id = getMember(authentication).getId();
-        Long order_status_id = order_status_id_map.get("order_status_id");
-        Page<Orders> orderList = orderRepository.findAllByMember_idAndOrderStatus_id(member_id,order_status_id, pageable);
+        Long orderStatusId = orderStatusIdMap.get("orderStatusId");
+        Page<Orders> orderList = orderRepository.findAllByMember_idAndOrderStatus_id(member_id,orderStatusId, pageable);
 
         List<Orders> orders = orderList.getContent();
 
@@ -269,7 +269,7 @@ public class OrderService {
             OrderListDto orderListDto = OrderListDto.builder()
                     .id(order.getId())
                     .orderNumber(order.getOrderNumber())
-                    .created_at(order.getCreated_at())
+                    .createdAt(order.getCreatedAt())
                     .orderStatus(order.getOrderStatus())
                     .paymentMethod(order.getPaymentMethod())
                     .totalPrice(order.getTotalPrice())
@@ -280,7 +280,7 @@ public class OrderService {
                 Item item = orderItem.getItem();
 
                 CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
-                        .item_id(item.getId())
+                        .itemId(item.getId())
                         .itemName(item.getItemName())
                         .color(item.getColor())
                         .size(item.getSize())

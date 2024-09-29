@@ -14,11 +14,11 @@ public class BoardCreateRequestDto {
 
     private String content;
 
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
-    private LocalDateTime modified_at;
+    private LocalDateTime modifiedAt;
 
-    private Integer star_rate;
+    private Integer starRate;
 
     private Member member;
 
@@ -26,8 +26,8 @@ public class BoardCreateRequestDto {
         return Board.builder()
                 .title(boardCreateRequestDto.getTitle())
                 .content(boardCreateRequestDto.getContent())
-                .star_rate(boardCreateRequestDto.getStar_rate())
-                .created_at(boardCreateRequestDto.getCreated_at())
+                .starRate(boardCreateRequestDto.getStarRate())
+                .createdAt(boardCreateRequestDto.getCreatedAt())
                 .member(boardCreateRequestDto.getMember())
                 .build();
     }

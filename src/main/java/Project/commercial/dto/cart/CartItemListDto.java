@@ -13,11 +13,11 @@ public class CartItemListDto {
 
     private List<CartAndOrderItemDto> cartItemList;
 
-    private String total_price;
+    private String totalPrice;
 
-    public CartItemListDto(List<CartAndOrderItemDto> cartItemList, String total_price) {
+    public CartItemListDto(List<CartAndOrderItemDto> cartItemList, String totalPrice) {
         this.cartItemList = cartItemList;
-        this.total_price = total_price;
+        this.totalPrice = totalPrice;
     }
 }
 

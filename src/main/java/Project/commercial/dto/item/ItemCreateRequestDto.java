@@ -10,28 +10,28 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ItemCreateRequestDto {
 
-    private Long category_id;
+    private Long categoryId;
 
-    private Long detailCategory_id;
+    private Long detailCategoryId;
 
     private String itemName;
 
     private String description;
 
-    private Long color_id;
+    private Long colorId;
 
-    private Long size_id;
+    private Long sizeId;
 
     private Integer price;
 
     @Builder
-    public ItemCreateRequestDto(Long category_id, Long detailCategory_id, String itemName, String description, Long color_id, Long size_id, Integer price) {
-        this.category_id = category_id;
-        this.detailCategory_id = detailCategory_id;
+    public ItemCreateRequestDto(Long categoryId, Long detailCategoryId, String itemName, String description, Long colorId, Long sizeId, Integer price) {
+        this.categoryId = categoryId;
+        this.detailCategoryId = detailCategoryId;
         this.itemName = itemName;
         this.description = description;
-        this.color_id = color_id;
-        this.size_id = size_id;
+        this.colorId = colorId;
+        this.sizeId = sizeId;
         this.price = price;
     }
 }

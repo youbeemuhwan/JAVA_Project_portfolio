@@ -29,11 +29,11 @@ public class ItemDto {
 
     private String price;
 
-    private List<DetailImage> detailImage = new ArrayList<>();
+    private List<DetailImage> detailImages;
 
     private ThumbnailImage thumbnailImage;
 
-    public ItemDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, String price, List<DetailImage> detailImage, ThumbnailImage thumbnailImage) {
+    public ItemDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, String price, List<DetailImage> detailImages, ThumbnailImage thumbnailImage) {
         this.id = id;
         this.category = category;
         this.detailCategory = detailCategory;
@@ -42,7 +42,7 @@ public class ItemDto {
         this.color = color;
         this.size = size;
         this.price = price;
-        this.detailImage = detailImage;
+        this.detailImages = detailImages;
         this.thumbnailImage = thumbnailImage;
     }
 }

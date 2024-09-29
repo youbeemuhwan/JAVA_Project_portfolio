@@ -31,10 +31,10 @@ public class Board {
 
     @Min(value = 1, message = "리뷰 별점은 최소 1 이상 이어야 합니다.")
     @Max(value = 5, message = "리뷰 별점은 최대 5 이하 이어야 합니다.")
-    private Integer star_rate;
+    private Integer starRate;
 
-    private LocalDateTime created_at;
-    private LocalDateTime modified_at;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", updatable = false)
@@ -45,19 +45,19 @@ public class Board {
     private List<BoardImage> boardImageList;
 
     @Builder
-    public Board(String title, String content,Integer star_rate, LocalDateTime created_at, LocalDateTime modified_at, Member member) {
+    public Board(String title, String content, Integer starRate, LocalDateTime createdAt, LocalDateTime modifiedAt, Member member) {
         this.title = title;
         this.content = content;
-        this.star_rate = star_rate;
-        this.created_at = created_at;
-        this.modified_at = modified_at;
+        this.starRate = starRate;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
         this.member = member;
     }
 
     public void updateBoard(BoardModifiedRequestDto modifiedRequestDto){
         this.title = modifiedRequestDto.getTitle();
         this.content = modifiedRequestDto.getContent();
-        this.star_rate = modifiedRequestDto.getStar_rate();
-        this.modified_at = modifiedRequestDto.getModified_at();
+        this.starRate = modifiedRequestDto.getStarRate();
+        this.modifiedAt = modifiedRequestDto.getModified_at();
     }
 }

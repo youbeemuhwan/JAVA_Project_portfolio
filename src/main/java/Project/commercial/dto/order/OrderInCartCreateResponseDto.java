@@ -15,22 +15,22 @@ import java.util.List;
 @Builder
 public class OrderInCartCreateResponseDto {
 
-    private Long order_id;
-    private String order_number;
-    private LocalDateTime created_at;
-    private List<CartAndOrderItemDto> item_list;
+    private Long orderId;
+    private String orderNumber;
+    private LocalDateTime createdAt;
+    private List<CartAndOrderItemDto> itemList;
     private String address;
-    private String total_price;
+    private String totalPrice;
     private PaymentMethod paymentMethod;
     private OrderStatus orderStatus;
 
-    public OrderInCartCreateResponseDto(Long order_id, String order_number, LocalDateTime created_at, List<CartAndOrderItemDto> item_list, String address, String total_price, PaymentMethod paymentMethod, OrderStatus orderStatus) {
-        this.order_id = order_id;
-        this.order_number = order_number;
-        this.created_at = created_at;
-        this.item_list = item_list;
+    public OrderInCartCreateResponseDto(Long orderId, String order_number, LocalDateTime createdAt, List<CartAndOrderItemDto> itemList, String address, String totalPrice, PaymentMethod paymentMethod, OrderStatus orderStatus) {
+        this.orderId = orderId;
+        this.orderNumber = order_number;
+        this.createdAt = createdAt;
+        this.itemList = itemList;
         this.address = address;
-        this.total_price = total_price;
+        this.totalPrice = totalPrice;
         this.paymentMethod = paymentMethod;
         this.orderStatus = orderStatus;
     }

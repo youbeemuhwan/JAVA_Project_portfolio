@@ -44,9 +44,9 @@ public class CartController {
 
     @DeleteMapping("/cart/delete")
     @ResponseBody
-    public String delete(@RequestBody Map<String, Long> item_id_map, Authentication authentication)
+    public String delete(@RequestBody Map<String, Long> itemIdMap, Authentication authentication)
     {
-        cartService.delete(item_id_map, authentication);
+        cartService.delete(itemIdMap, authentication);
         return "DELETE DONE";
     }
 

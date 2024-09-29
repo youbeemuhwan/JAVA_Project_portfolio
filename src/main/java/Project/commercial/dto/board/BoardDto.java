@@ -21,23 +21,23 @@ public class BoardDto {
 
     private String content;
 
-    private Integer star_rate;
+    private Integer starRate;
 
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
-    private LocalDateTime modified_at;
+    private LocalDateTime modifiedAt;
 
     private MemberDto member;
 
     private List<BoardImage> boardImages;
 
-    public BoardDto(Long id, String title, String content, Integer star_rate, LocalDateTime created_at, LocalDateTime modified_at, MemberDto member, List<BoardImage> boardImages) {
+    public BoardDto(Long id, String title, String content, Integer starRate, LocalDateTime createdAt, LocalDateTime modifiedAt, MemberDto member, List<BoardImage> boardImages) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.star_rate = star_rate;
-        this.created_at = created_at;
-        this.modified_at = modified_at;
+        this.starRate = starRate;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
         this.member = member;
         this.boardImages = boardImages;
     }

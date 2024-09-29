@@ -11,5 +11,5 @@ public class OrderInCartCreateRequestDto {
 
     private String address;
 
-    private Long paymentMethod_id;
+    private Long paymentMethodId;
 }

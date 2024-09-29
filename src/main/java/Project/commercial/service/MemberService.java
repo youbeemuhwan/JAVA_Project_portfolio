@@ -45,7 +45,7 @@ public class MemberService {
 
        if(!passwordEncoder.matches(memberLoginRequestDto.getPassword(), loginMember.getPassword()))
        {
-           throw new RuntimeException("존재하지 않는 계정 이거나 올바르지 못환 패스워드 입니다.");
+           throw new RuntimeException("존재하지 않는 계정 이거나 올바르지 않은 패스워드 입니다.");
        }
 
        return MemberLoginResponseDto.builder()

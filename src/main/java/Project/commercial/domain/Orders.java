@@ -1,8 +1,5 @@
 package Project.commercial.domain;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +21,7 @@ public class Orders {
 
     private String orderNumber;
 
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -47,9 +44,9 @@ public class Orders {
     private OrderStatus orderStatus;
 
     @Builder
-    public Orders(String orderNumber, LocalDateTime created_at, Member member, List<OrderItem> orderItem, String address, Integer totalPrice, PaymentMethod paymentMethod, OrderStatus orderStatus) {
+    public Orders(String orderNumber, LocalDateTime createdAt, Member member, List<OrderItem> orderItem, String address, Integer totalPrice, PaymentMethod paymentMethod, OrderStatus orderStatus) {
         this.orderNumber = orderNumber;
-        this.created_at = created_at;
+        this.createdAt = createdAt;
         this.member = member;
         this.orderItem = orderItem;
         this.address = address;

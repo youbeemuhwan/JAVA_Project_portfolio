@@ -49,8 +49,8 @@ public class OrdersController {
 
     @GetMapping("order/my_order/order_status")
     @ResponseBody
-    public List<OrderListDto> listByOrderStatus(@RequestBody Map<String, Long> order_status_id_map, @PageableDefault(size = 5) Pageable pageable, Authentication authentication)
+    public List<OrderListDto> listByOrderStatus(@RequestBody Map<String, Long> orderStatusIdMap, @PageableDefault(size = 5) Pageable pageable, Authentication authentication)
     {
-        return orderService.listByOrderStatus(order_status_id_map, pageable, authentication);
+        return orderService.listByOrderStatus(orderStatusIdMap, pageable, authentication);
     }
 }

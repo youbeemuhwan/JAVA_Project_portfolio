@@ -45,16 +45,16 @@ public class ItemController {
 
     @GetMapping("/item/list/search")
     @ResponseBody
-    public List<ItemDto> search(@RequestBody ItemSearchConditionDto itemSearchConditionDto, @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
+    public ItemSearchResponseDto search(@RequestBody ItemSearchConditionDto itemSearchConditionDto, @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
     {
         return itemService.search(itemSearchConditionDto, pageable);
     }
 
     @DeleteMapping("/item/delete")
     @ResponseBody
-    public String delete(@RequestBody Map<String, Long> item_id_map)
+    public String delete(@RequestBody Map<String, Long> itemIdMap)
     {
-        itemService.delete(item_id_map);
+        itemService.delete(itemIdMap);
         return "Item Delete Done";
     }
 

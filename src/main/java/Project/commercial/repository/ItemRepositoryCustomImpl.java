@@ -23,18 +23,35 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom{
         return jpaQueryFactory
                 .selectFrom(item)
                 .where(
-                        categoryEq(itemSearchConditionDto.getCategory_id()),
-                        detailCategoryEq(itemSearchConditionDto.getDetailCategory_id()),
-                        colorEq(itemSearchConditionDto.getColor_id()),
-                        sizeEq(itemSearchConditionDto.getSize_id()),
+                        categoryEq(itemSearchConditionDto.getCategoryId()),
+                        detailCategoryEq(itemSearchConditionDto.getDetailCategoryId()),
+                        colorEq(itemSearchConditionDto.getColorId()),
+                        sizeEq(itemSearchConditionDto.getSizeId()),
                         itemNameContain(itemSearchConditionDto.getItemName()),
-                        priceBetween(itemSearchConditionDto.getMinimum_amount(), itemSearchConditionDto.getMax_amount())
+                        priceBetween(itemSearchConditionDto.getMinimumAmount(), itemSearchConditionDto.getMaxAmount())
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(item.id.asc())
-                .fetchResults().getResults();
+                .fetch();
     }
+
+    public Long getSearchItemCount(ItemSearchConditionDto itemSearchConditionDto){
+         return jpaQueryFactory
+                .select(item.count())
+                .from(item)
+                .where(
+                        categoryEq(itemSearchConditionDto.getCategoryId()),
+                        detailCategoryEq(itemSearchConditionDto.getDetailCategoryId()),
+                        colorEq(itemSearchConditionDto.getColorId()),
+                        sizeEq(itemSearchConditionDto.getSizeId()),
+                        itemNameContain(itemSearchConditionDto.getItemName()),
+                        priceBetween(itemSearchConditionDto.getMinimumAmount(), itemSearchConditionDto.getMaxAmount())
+                )
+                .fetchOne();
+    }
+    
+    
 
     private BooleanExpression itemNameContain(String username){
         if(StringUtils.isNullOrEmpty(username))
@@ -76,23 +93,20 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom{
         return item.category.id.eq(category_id);
     }
 
-    private BooleanExpression priceBetween(@Nullable Integer minimum_price, @Nullable Integer max_price){
+    private BooleanExpression priceBetween(@Nullable Integer minimumPrice, @Nullable Integer maxPrice){
 
-       if (minimum_price == null && max_price == null){
+       if (minimumPrice == null && maxPrice == null){
            return item.price.goe(0);
        }
 
-       if (!(minimum_price == null) && (max_price == null)){
-           return item.price.goe(minimum_price);
+       if (!(minimumPrice == null) && (maxPrice == null)){
+           return item.price.goe(minimumPrice);
        }
 
-       if ((minimum_price == null) && !(max_price == null)){
-           return item.price.loe(max_price);
+       if (minimumPrice == null){
+           return item.price.loe(maxPrice);
        }
 
-       if (!(minimum_price == null) && !(max_price == null)){
-           return item.price.between(minimum_price, max_price);
-       }
-       return null;
+        return item.price.between(minimumPrice, maxPrice);
     }
 }

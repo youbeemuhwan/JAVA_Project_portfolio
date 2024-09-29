@@ -46,7 +46,7 @@ public class BoardService {
                                          Authentication authentication) throws IOException {
 
             LocalDateTime now = LocalDateTime.now();
-            boardCreateRequestDto.setCreated_at(now);
+            boardCreateRequestDto.setCreatedAt(now);
 
             String email = authentication.getName();
             Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("해당 유저는 존재하지 않습니다."));
@@ -60,14 +60,14 @@ public class BoardService {
             }
 
             Board board = boardRepository.findById(saveBoard.getId()).orElseThrow(() -> new EntityNotFoundException("해당 게시판을 찾을 수 없습니다."));
-            List<BoardImage> boardImageList = boardImageRepository.findAllByBoard_id(board.getId());
+            List<BoardImage> boardImageList = boardImageRepository.findAllByBoardId(board.getId());
 
         return BoardCreateResponseDto.builder()
                 .id(saveBoard.getId())
                 .title(saveBoard.getTitle())
                 .content(saveBoard.getContent())
-                .star_rate(saveBoard.getStar_rate())
-                .created_at(saveBoard.getCreated_at())
+                .starRate(saveBoard.getStarRate())
+                .createdAt(saveBoard.getCreatedAt())
                 .username(saveBoard.getMember().getUsername())
                 .boardImageList(boardImageList)
                 .build();
@@ -85,7 +85,7 @@ public class BoardService {
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
-                .modified_at(board.getModified_at())
+                .modifiedAt(board.getModifiedAt())
                 .build();
     }
 
@@ -98,7 +98,7 @@ public class BoardService {
     }
     @Transactional(readOnly = true)
     public List<BoardDto> listByMember(Long member_id, Pageable pageable){
-        Page<Board> boardList = boardRepository.findByMember_id(member_id, pageable);
+        Page<Board> boardList = boardRepository.findByMemberId(member_id, pageable);
         return getBoardList(boardList);
     }
 
@@ -107,7 +107,7 @@ public class BoardService {
         Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(
                 () -> (new EntityNotFoundException("잘못된 접근입니다.")));
 
-        Page<Board> findBoards = boardRepository.findByMember_id(member.getId(), pageable);
+        Page<Board> findBoards = boardRepository.findByMemberId(member.getId(), pageable);
         return getBoardList(findBoards);
     }
     @Transactional(readOnly = true)
@@ -134,9 +134,9 @@ public class BoardService {
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
-                .star_rate(board.getStar_rate())
-                .created_at(board.getCreated_at())
-                .modified_at(board.getModified_at())
+                .starRate(board.getStarRate())
+                .createdAt(board.getCreatedAt())
+                .modifiedAt(board.getModifiedAt())
                 .member(memberDto)
                 .boardImages(board.getBoardImageList())
                 .build();
@@ -161,10 +161,10 @@ public class BoardService {
             return BoardDto.builder()
                     .id(board.getId())
                     .content(board.getContent())
-                    .star_rate(board.getStar_rate())
-                    .created_at(board.getCreated_at())
+                    .starRate(board.getStarRate())
+                    .createdAt(board.getCreatedAt())
                     .boardImages(board.getBoardImageList())
-                    .modified_at(board.getModified_at())
+                    .modifiedAt(board.getModifiedAt())
                     .member(memberDto)
                     .build();
         }).collect(Collectors.toList());
