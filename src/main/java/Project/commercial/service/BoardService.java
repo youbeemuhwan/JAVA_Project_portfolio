@@ -41,18 +41,18 @@ public class BoardService {
     @Value("${file.dir}")
     private String fileDir;
     @Transactional
-    public BoardCreateResponseDto create(BoardCreateRequestDto boardCreateRequestDto,
-                                         List<MultipartFile> files ,
-                                         Authentication authentication) throws IOException {
+    public ResponseBoardDto createBoard(CreateBoardDto createBoardDto,
+                                        List<MultipartFile> files ,
+                                        Authentication authentication) throws IOException {
 
             LocalDateTime now = LocalDateTime.now();
-            boardCreateRequestDto.setCreatedAt(now);
+            createBoardDto.setCreatedAt(now);
 
             String email = authentication.getName();
             Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("해당 유저는 존재하지 않습니다."));
-            boardCreateRequestDto.setMember(member);
+            createBoardDto.setMember(member);
 
-            Board boardEntity = boardCreateRequestDto.toEntity(boardCreateRequestDto);
+            Board boardEntity = createBoardDto.toEntity(createBoardDto);
             Board saveBoard = boardRepository.save(boardEntity);
 
             if(files != null){
@@ -62,7 +62,7 @@ public class BoardService {
             Board board = boardRepository.findById(saveBoard.getId()).orElseThrow(() -> new EntityNotFoundException("해당 게시판을 찾을 수 없습니다."));
             List<BoardImage> boardImageList = boardImageRepository.findAllByBoardId(board.getId());
 
-        return BoardCreateResponseDto.builder()
+        return ResponseBoardDto.builder()
                 .id(saveBoard.getId())
                 .title(saveBoard.getTitle())
                 .content(saveBoard.getContent())
@@ -73,54 +73,46 @@ public class BoardService {
                 .build();
         }
     @Transactional
-    public BoardModifiedResponseDto modified(BoardModifiedRequestDto boardModifiedRequestDto, Authentication authentication){
-        Long board_id = boardModifiedRequestDto.getId();
-        Board board = getBoardAuthority(board_id, authentication);
+    public void updateBoard(Long id, UpdateBoardDto updateBoardDto, Authentication authentication){
+        Board board = getBoardAuthority(id, authentication);
 
-        boardModifiedRequestDto.setModified_at(LocalDateTime.now());
+        updateBoardDto.setModifiedAt(LocalDateTime.now());
 
-        board.updateBoard(boardModifiedRequestDto);
+        board.updateBoard(updateBoardDto);
 
-        return BoardModifiedResponseDto.builder()
-                .id(board.getId())
-                .title(board.getTitle())
-                .content(board.getContent())
-                .modifiedAt(board.getModifiedAt())
-                .build();
+
     }
 
     @Transactional
-    public void delete(Map<String, Long> board_id_map, Authentication authentication){
-        Long board_id = board_id_map.get("board_id");
-        Board board = getBoardAuthority(board_id, authentication);
+    public void deleteBoard(Long id, Authentication authentication){
+        Board board = getBoardAuthority(id, authentication);
 
         boardRepository.delete(board);
     }
     @Transactional(readOnly = true)
-    public List<BoardDto> listByMember(Long member_id, Pageable pageable){
-        Page<Board> boardList = boardRepository.findByMemberId(member_id, pageable);
-        return getBoardList(boardList);
+    public List<BoardDto> getBoardsByMember(Long memberId, Pageable pageable){
+        Page<Board> boardList = boardRepository.findByMemberId(memberId, pageable);
+        return toDtoForBoards(boardList);
     }
 
     @Transactional(readOnly = true)
-    public List<BoardDto> listByMe(Authentication authentication,Pageable pageable){
+    public List<BoardDto> getMyBoards(Authentication authentication, Pageable pageable){
         Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(
                 () -> (new EntityNotFoundException("잘못된 접근입니다.")));
 
         Page<Board> findBoards = boardRepository.findByMemberId(member.getId(), pageable);
-        return getBoardList(findBoards);
+        return toDtoForBoards(findBoards);
     }
     @Transactional(readOnly = true)
-    public List<BoardDto> search(String keyword, Pageable pageable){
+    public List<BoardDto> searchBoards(String keyword, Pageable pageable){
         Page<Board> findBoards = boardRepository.findByTitleContaining(keyword, pageable);
-        return getBoardList(findBoards);
+        return toDtoForBoards(findBoards);
 
     }
     @Transactional(readOnly = true)
-    public BoardDto detailPage(Map<String, Long> map_board_id){
-
-        Long board_id = map_board_id.get("board_id");
-        Board board = boardRepository.findById(board_id).orElseThrow(
+    public BoardDto getBoardDetail(Long id){
+        
+        Board board = boardRepository.findById(id).orElseThrow(
                 () -> (new EntityNotFoundException("해당 게시글은 존재하지 않습니다.")));
 
         Member member = board.getMember();
@@ -142,13 +134,13 @@ public class BoardService {
                 .build();
     }
 
-    public List<BoardDto> list(Pageable pageable){
+    public List<BoardDto> getBoards(Pageable pageable){
         Page<Board> findBoards = boardRepository.findAll(pageable);
-        return getBoardList(findBoards);
+        return toDtoForBoards(findBoards);
 
     }
 
-    private List<BoardDto> getBoardList(Page<Board> boards) {
+    private List<BoardDto> toDtoForBoards(Page<Board> boards) {
         return boards.getContent().stream().map(board -> {
             Member member = board.getMember();
 
@@ -196,13 +188,13 @@ public class BoardService {
             String saveFileName = createSaveFileName(originalFilename);
             file.transferTo(new File(getFullPath(saveFileName)));
 
-            BoardImageRequestDto boardImageRequestDto = BoardImageRequestDto.builder()
+            CreateBoardImagesDto createBoardImagesDto = CreateBoardImagesDto.builder()
                     .uploadImageName(originalFilename)
                     .storeImageName(saveFileName)
                     .board(saveBoard)
                     .build();
 
-            BoardImage boardImageEntity = boardImageRequestDto.toEntity(boardImageRequestDto);
+            BoardImage boardImageEntity = createBoardImagesDto.toEntity(createBoardImagesDto);
             boardImageRepository.save(boardImageEntity);
         }
     }

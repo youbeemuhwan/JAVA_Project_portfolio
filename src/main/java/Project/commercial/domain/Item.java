@@ -1,7 +1,7 @@
 package Project.commercial.domain;
 
 
-import Project.commercial.dto.item.ItemModifiedResponseDto;
+import Project.commercial.dto.item.ResponseUpdateItemDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,14 +69,14 @@ public class Item {
         this.thumbnailImage = thumbnailImage;
     }
 
-    public void updateItem(ItemModifiedResponseDto itemModifiedResponseDto){
-        this.detailCategory = itemModifiedResponseDto.getDetailCategory();
-        this.category = itemModifiedResponseDto.getCategory();
-        this.itemName = itemModifiedResponseDto.getItemName();
-        this.description = itemModifiedResponseDto.getDescription();
-        this.color = itemModifiedResponseDto.getColor();
-        this.size = itemModifiedResponseDto.getSize();
-        this.price = (itemModifiedResponseDto.getPrice());
+    public void updateItem(ResponseUpdateItemDto responseUpdateItemDto){
+        this.detailCategory = responseUpdateItemDto.getDetailCategory();
+        this.category = responseUpdateItemDto.getCategory();
+        this.itemName = responseUpdateItemDto.getItemName();
+        this.description = responseUpdateItemDto.getDescription();
+        this.color = responseUpdateItemDto.getColor();
+        this.size = responseUpdateItemDto.getSize();
+        this.price = (responseUpdateItemDto.getPrice());
     }
 
 

@@ -37,22 +37,22 @@ public class ItemService {
     @Value("$(file.dir)")
     String fileDir;
     @Transactional
-    public ItemCreateResponseDto create(ItemCreateRequestDto itemCreateRequestDto, MultipartFile thumbnailImage, List<MultipartFile> detailImages) throws IOException {
+    public ResponseItemDto createItem(CreateItemDto createItemDto, MultipartFile thumbnailImage, List<MultipartFile> detailImages) throws IOException {
         validateThumbnailImage(thumbnailImage);
 
-        DetailCategory detailCategory = findByIdOrThrow(detailCategoryRepository, itemCreateRequestDto.getDetailCategoryId(), "Invalid Detail Category ID");
-        Category category = findByIdOrThrow(categoryRepository, itemCreateRequestDto.getCategoryId(), "Invalid Category ID");
-        Color color = findByIdOrThrow(colorRepository, itemCreateRequestDto.getColorId(), "Invalid Color ID");
-        Size size = findByIdOrThrow(sizeRepository, itemCreateRequestDto.getSizeId(), "Invalid Size ID");
+        DetailCategory detailCategory = findByIdOrThrow(detailCategoryRepository, createItemDto.getDetailCategoryId(), "Invalid Detail Category ID");
+        Category category = findByIdOrThrow(categoryRepository, createItemDto.getCategoryId(), "Invalid Category ID");
+        Color color = findByIdOrThrow(colorRepository, createItemDto.getColorId(), "Invalid Color ID");
+        Size size = findByIdOrThrow(sizeRepository, createItemDto.getSizeId(), "Invalid Size ID");
 
-        Item newItem = createNewItem(itemCreateRequestDto, detailCategory, category, color, size);
+        Item newItem = createNewItem(createItemDto, detailCategory, category, color, size);
         ThumbnailImage thumbnailImageEntity = saveThumbnailImage(thumbnailImage, newItem);
 
         if (!CollectionUtils.isEmpty(detailImages)) {
             saveDetailImages(detailImages, newItem);
         }
 
-        return ItemCreateResponseDto.builder()
+        return ResponseItemDto.builder()
                 .id(newItem.getId())
                 .category(newItem.getCategory())
                 .detailCategory(newItem.getDetailCategory())
@@ -66,7 +66,7 @@ public class ItemService {
                 .build();
     }
     @Transactional(readOnly = true)
-    public List<ItemDto> list(Pageable pageable) {
+    public List<ItemDto> getItems(Pageable pageable) {
         Page<Item> items = itemRepository.findAll(pageable);
         return items.stream()
                 .map(item -> ItemDto.builder()
@@ -78,14 +78,17 @@ public class ItemService {
                         .size(item.getSize())
                         .color(item.getColor())
                         .price(comma(item.getPrice()))
-                        .thumbnailImage(item.getThumbnailImage())
+                        .thumbnailImage(ResponseThumbnailImageDto.builder().itemId(item.getId()).storeImageName(item.getThumbnailImage().getStoreImageName()).build())
                         .build())
                 .collect(Collectors.toList());
     }
     @Transactional(readOnly = true)
-    public ItemSearchResponseDto search(ItemSearchConditionDto itemSearchConditionDto, Pageable pageable) {
+    public ItemSearchResponseDto getItemsBySearch(ItemSearchConditionDto itemSearchConditionDto, Pageable pageable) {
         List<Item> itemList = itemRepository.searchItem(itemSearchConditionDto, pageable);
         Long totalItemCount = itemRepository.getSearchItemCount(itemSearchConditionDto);
+
+
+
         List<ItemDto> itemDtoList = itemList.stream()
                 .map(item -> ItemDto.builder()
                         .id(item.getId())
@@ -96,7 +99,7 @@ public class ItemService {
                         .size(item.getSize())
                         .color(item.getColor())
                         .price(comma(item.getPrice()))
-                        .thumbnailImage(item.getThumbnailImage())
+                        .thumbnailImage(ResponseThumbnailImageDto.builder().itemId(item.getId()).storeImageName(item.getThumbnailImage().getStoreImageName()).build())
                         .build())
                 .collect(Collectors.toList());
 
@@ -107,9 +110,24 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public ItemDto detailPage(Map<String, Long> item_id_map) {
-        Long itemId = item_id_map.get("item_id");
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품 입니다."));
+    public ItemDto getItemDetail(Long id) {
+
+        Item item = itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품 입니다."));
+
+        List<DetailImageDto> detailImageDtos = Optional.ofNullable(item.getDetailImage())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(v -> DetailImageDto.builder()
+                        .id(v.getId())
+                        .storeImageName(v.getStoreImageName())
+                        .build())
+                .collect(Collectors.toList());
+
+
+        ResponseThumbnailImageDto thumbnailImageDto = ResponseThumbnailImageDto.builder()
+                .itemId(item.getId())
+                .storeImageName(item.getThumbnailImage().getStoreImageName())
+                .build();
 
         return ItemDto.builder()
                 .id(item.getId())
@@ -120,31 +138,31 @@ public class ItemService {
                 .size(item.getSize())
                 .color(item.getColor())
                 .price(comma(item.getPrice()))
-                .thumbnailImage(item.getThumbnailImage())
-                .detailImages(item.getDetailImage())
+                .thumbnailImage(thumbnailImageDto)
+                .detailImages(detailImageDtos)
                 .build();
+
     }
     @Transactional
-    public void delete(Map<String, Long> item_id_map) {
-        Long itemId = item_id_map.get("item_id");
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품 입니다."));
+    public void deleteItem(Long id) {
+        Item item = itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품 입니다."));
 
         itemRepository.delete(item);
     }
 
     @Transactional
-    public ItemModifiedResponseDto modified(ItemModifiedRequestDto itemModifiedRequestDto, MultipartFile newThumbnailImage, List<MultipartFile> newDetailImages) throws IOException {
-        Item item = itemRepository.findById(itemModifiedRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품 입니다."));
+    public void updateItem(Long id, UpdateItemDto updateItemDto, MultipartFile newThumbnailImage, List<MultipartFile> newDetailImages) throws IOException {
+        Item item = itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품 입니다."));
 
         validateThumbnailImage(newThumbnailImage);
 
-        // Handle thumbnail image update
+
         if (thumbnailImageRepository.findByItem_id(item.getId()).isPresent()) {
             thumbnailImageRepository.deleteByItem_id(item.getId());
         }
         ThumbnailImage thumbnailImageEntity = saveThumbnailImage(newThumbnailImage, item);
 
-        // Handle detail images update
+
         List<DetailImage> existingDetailImages = item.getDetailImage();
         if (CollectionUtils.isEmpty(existingDetailImages) && !CollectionUtils.isEmpty(newDetailImages)) {
             saveDetailImages(newDetailImages, item);
@@ -153,36 +171,23 @@ public class ItemService {
             saveDetailImages(newDetailImages, item);
         }
 
-        DetailCategory detailCategory = findByIdOrThrow(detailCategoryRepository, itemModifiedRequestDto.getDetailCategoryId(), "Invalid Detail Category ID");
-        Category category = findByIdOrThrow(categoryRepository, itemModifiedRequestDto.getCategoryId(), "Invalid Category ID");
-        Color color = findByIdOrThrow(colorRepository, itemModifiedRequestDto.getColorId(), "Invalid Color ID");
-        Size size = findByIdOrThrow(sizeRepository, itemModifiedRequestDto.getSizeId(), "Invalid Size ID");
+        DetailCategory detailCategory = findByIdOrThrow(detailCategoryRepository, updateItemDto.getDetailCategoryId(), "Invalid Detail Category ID");
+        Category category = findByIdOrThrow(categoryRepository, updateItemDto.getCategoryId(), "Invalid Category ID");
+        Color color = findByIdOrThrow(colorRepository, updateItemDto.getColorId(), "Invalid Color ID");
+        Size size = findByIdOrThrow(sizeRepository, updateItemDto.getSizeId(), "Invalid Size ID");
 
-        item.updateItem(ItemModifiedResponseDto.builder()
+        item.updateItem(ResponseUpdateItemDto.builder()
                 .id(item.getId())
-                .itemName(itemModifiedRequestDto.getItemName())
-                .description(itemModifiedRequestDto.getDescription())
+                .itemName(updateItemDto.getItemName())
+                .description(updateItemDto.getDescription())
                 .detailCategory(detailCategory)
                 .category(category)
                 .size(size)
                 .color(color)
-                .price(itemModifiedRequestDto.getPrice())
+                .price(updateItemDto.getPrice())
                 .thumbnailImage(thumbnailImageEntity)
                 .detailImages(detailImageRepository.findAllByItemId(item.getId()))
                 .build());
-
-        return ItemModifiedResponseDto.builder()
-                .id(item.getId())
-                .itemName(itemModifiedRequestDto.getItemName())
-                .description(itemModifiedRequestDto.getDescription())
-                .detailCategory(detailCategory)
-                .category(category)
-                .size(size)
-                .color(color)
-                .price(itemModifiedRequestDto.getPrice())
-                .thumbnailImage(thumbnailImageEntity)
-                .detailImages(detailImageRepository.findAllByItemId(item.getId()))
-                .build();
     }
 
 
@@ -219,7 +224,7 @@ public class ItemService {
         }
     }
 
-    private Item createNewItem(ItemCreateRequestDto dto, DetailCategory detailCategory, Category category, Color color, Size size) {
+    private Item createNewItem(CreateItemDto dto, DetailCategory detailCategory, Category category, Color color, Size size) {
         Item item = Item.builder()
                 .itemName(dto.getItemName())
                 .detailCategory(detailCategory)

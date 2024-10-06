@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class DetailImageRequestDto {
+public class CreateDetailImageDto {
 
     private String uploadImageName;
 
@@ -22,19 +22,19 @@ public class DetailImageRequestDto {
 
     private Item item;
 
-    public DetailImageRequestDto(String uploadImageName, String storeImageName, Long fileSize ,Item item) {
+    public CreateDetailImageDto(String uploadImageName, String storeImageName, Long fileSize , Item item) {
         this.uploadImageName = uploadImageName;
         this.storeImageName = storeImageName;
         this.fileSize = fileSize;
         this.item = item;
     }
 
-    public DetailImage toEntity(DetailImageRequestDto detailImageRequestDto){
+    public DetailImage toEntity(CreateDetailImageDto createDetailImageDto){
         return DetailImage.builder()
-                .uploadImageName(detailImageRequestDto.getUploadImageName())
-                .storeImageName(detailImageRequestDto.getStoreImageName())
-                .fileSize(detailImageRequestDto.getFileSize())
-                .item(detailImageRequestDto.getItem())
+                .uploadImageName(createDetailImageDto.getUploadImageName())
+                .storeImageName(createDetailImageDto.getStoreImageName())
+                .fileSize(createDetailImageDto.getFileSize())
+                .item(createDetailImageDto.getItem())
                 .build();
     }
 }

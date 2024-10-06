@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ItemCreateRequestDto {
+public class CreateItemDto {
 
     private Long categoryId;
 
@@ -25,7 +25,7 @@ public class ItemCreateRequestDto {
     private Integer price;
 
     @Builder
-    public ItemCreateRequestDto(Long categoryId, Long detailCategoryId, String itemName, String description, Long colorId, Long sizeId, Integer price) {
+    public CreateItemDto(Long categoryId, Long detailCategoryId, String itemName, String description, Long colorId, Long sizeId, Integer price) {
         this.categoryId = categoryId;
         this.detailCategoryId = detailCategoryId;
         this.itemName = itemName;

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class BoardCreateRequestDto {
+public class CreateBoardDto {
 
     private String title;
 
@@ -22,13 +22,13 @@ public class BoardCreateRequestDto {
 
     private Member member;
 
-    public Board toEntity(BoardCreateRequestDto boardCreateRequestDto){
+    public Board toEntity(CreateBoardDto createBoardDto){
         return Board.builder()
-                .title(boardCreateRequestDto.getTitle())
-                .content(boardCreateRequestDto.getContent())
-                .starRate(boardCreateRequestDto.getStarRate())
-                .createdAt(boardCreateRequestDto.getCreatedAt())
-                .member(boardCreateRequestDto.getMember())
+                .title(createBoardDto.getTitle())
+                .content(createBoardDto.getContent())
+                .starRate(createBoardDto.getStarRate())
+                .createdAt(createBoardDto.getCreatedAt())
+                .member(createBoardDto.getMember())
                 .build();
     }
 

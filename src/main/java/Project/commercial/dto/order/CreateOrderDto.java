@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrderCreateRequestDto {
+public class CreateOrderDto {
 
     private String orderNumber;
 
@@ -27,7 +27,7 @@ public class OrderCreateRequestDto {
     private LocalDateTime createdAt;
 
     @Builder
-    public OrderCreateRequestDto(String orderNumber, Long itemId, Integer quantity, String address, Long paymentMethodId, Long orderStatusId, LocalDateTime createdAt) {
+    public CreateOrderDto(String orderNumber, Long itemId, Integer quantity, String address, Long paymentMethodId, Long orderStatusId, LocalDateTime createdAt) {
         this.orderNumber = orderNumber;
         this.itemId = itemId;
         this.quantity = quantity;

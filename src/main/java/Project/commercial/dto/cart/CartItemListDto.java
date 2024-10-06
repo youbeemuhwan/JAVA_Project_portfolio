@@ -11,11 +11,11 @@ import java.util.List;
 @Builder
 public class CartItemListDto {
 
-    private List<CartAndOrderItemDto> cartItemList;
+    private List<ResponseItemInCartAndOrderDto> cartItemList;
 
     private String totalPrice;
 
-    public CartItemListDto(List<CartAndOrderItemDto> cartItemList, String totalPrice) {
+    public CartItemListDto(List<ResponseItemInCartAndOrderDto> cartItemList, String totalPrice) {
         this.cartItemList = cartItemList;
         this.totalPrice = totalPrice;
     }

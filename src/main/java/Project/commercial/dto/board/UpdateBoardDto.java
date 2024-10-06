@@ -9,9 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class BoardModifiedRequestDto {
-
-    private Long id;
+public class UpdateBoardDto {
 
     private String title;
 
@@ -19,13 +17,13 @@ public class BoardModifiedRequestDto {
 
     private Integer starRate;
 
-    private LocalDateTime modified_at;
+    private LocalDateTime modifiedAt;
 
-    public BoardModifiedRequestDto(Long id, String title, String content, Integer starRate, LocalDateTime modified_at) {
-        this.id = id;
+    public UpdateBoardDto(String title, String content, Integer starRate, LocalDateTime modifiedAt) {
+
         this.title = title;
         this.content = content;
         this.starRate = starRate;
-        this.modified_at = modified_at;
+        this.modifiedAt = modifiedAt;
     }
 }

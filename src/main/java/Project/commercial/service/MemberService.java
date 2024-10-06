@@ -2,7 +2,7 @@ package Project.commercial.service;
 
 import Project.commercial.dto.member.MemberLoginRequestDto;
 import Project.commercial.dto.member.MemberLoginResponseDto;
-import Project.commercial.dto.member.MemberSignUpDto;
+import Project.commercial.dto.member.CreateMemberDto;
 import Project.commercial.domain.Member;
 import Project.commercial.jwt.JwtProvider;
 import Project.commercial.repository.MemberRepository;
@@ -20,19 +20,19 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    public void signUp(MemberSignUpDto memberSignUpDto){
+    public void signUp(CreateMemberDto createMemberDto){
 
-        if (memberRepository.existsByEmail(memberSignUpDto.getEmail()))
+        if (memberRepository.existsByEmail(createMemberDto.getEmail()))
         {
             throw new RuntimeException("해당 이메일은 존재하는 이메일 입니다.");
         }
 
-        String encode = passwordEncoder.encode(memberSignUpDto.getPassword());
-        memberSignUpDto.setPassword(encode);
+        String encode = passwordEncoder.encode(createMemberDto.getPassword());
+        createMemberDto.setPassword(encode);
 
-        memberSignUpDto.setPoint(10000);
+        createMemberDto.setPoint(10000);
 
-        Member member = memberSignUpDto.toEntity(memberSignUpDto);
+        Member member = createMemberDto.toEntity(createMemberDto);
 
         memberRepository.save(member);
 

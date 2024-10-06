@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ThumbnailImageRequestDto {
+public class CreateThumbnailImageDto {
 
     private String uploadImageName;
 
@@ -19,20 +19,22 @@ public class ThumbnailImageRequestDto {
 
     private Item item;
 
-    public ThumbnailImageRequestDto(String uploadImageName, String storeImageName, Long fileSize, Item item) {
+    public CreateThumbnailImageDto(String uploadImageName, String storeImageName, Long fileSize, Item item) {
         this.uploadImageName = uploadImageName;
         this.storeImageName = storeImageName;
         this.fileSize = fileSize;
         this.item = item;
     }
 
-    public ThumbnailImage toEntity(ThumbnailImageRequestDto thumbnailImageRequestDto){
+    public ThumbnailImage toEntity(CreateThumbnailImageDto createThumbnailImageDto){
         return ThumbnailImage.builder()
-                .uploadImageName(thumbnailImageRequestDto.getUploadImageName())
-                .storeImageName(thumbnailImageRequestDto.getStoreImageName())
-                .fileSize(thumbnailImageRequestDto.getFileSize())
-                .item(thumbnailImageRequestDto.getItem())
+                .uploadImageName(createThumbnailImageDto.getUploadImageName())
+                .storeImageName(createThumbnailImageDto.getStoreImageName())
+                .fileSize(createThumbnailImageDto.getFileSize())
+                .item(createThumbnailImageDto.getItem())
                 .build();
 
     }
 }
+
+

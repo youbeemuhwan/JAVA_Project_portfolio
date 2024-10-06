@@ -1,7 +1,7 @@
 package Project.commercial.service;
 
 import Project.commercial.domain.*;
-import Project.commercial.dto.cart.CartAndOrderItemDto;
+import Project.commercial.dto.cart.ResponseItemInCartAndOrderDto;
 import Project.commercial.dto.order.*;
 import Project.commercial.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -33,39 +33,39 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
 
 
-    public OrderCreateResponseDto orderCreate(OrderCreateRequestDto orderCreateRequestDto, Authentication authentication) {
-        Orders newOrder = buildOrder(orderCreateRequestDto, authentication);
+    public ResponseCreateOrderDto createOrder(CreateOrderDto createOrderDto, Authentication authentication) {
+        Orders newOrder = buildOrder(createOrderDto, authentication);
         orderRepository.save(newOrder);
 
-        handlePaymentMethod(newOrder, orderCreateRequestDto);
+        handlePaymentMethod(newOrder, createOrderDto);
 
-        OrderItem newOrderItem = buildOrderItem(newOrder, orderCreateRequestDto);
+        OrderItem newOrderItem = buildOrderItem(newOrder, createOrderDto);
         orderItemRepository.save(newOrderItem);
 
         return buildOrderResponse(newOrder, newOrderItem);
     }
 
-    private Orders buildOrder(OrderCreateRequestDto orderCreateRequestDto, Authentication authentication) {
-        PaymentMethod paymentMethod = paymentMethodRepository.findById(orderCreateRequestDto.getPaymentMethodId())
+    private Orders buildOrder(CreateOrderDto createOrderDto, Authentication authentication) {
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(createOrderDto.getPaymentMethodId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 결제 수단입니다."));
 
 
-        Item item = itemRepository.findById(orderCreateRequestDto.getItemId())
+        Item item = itemRepository.findById(createOrderDto.getItemId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 아이템입니다."));
 
 
-        int totalPrice = item.getPrice() * orderCreateRequestDto.getQuantity();
+        int totalPrice = item.getPrice() * createOrderDto.getQuantity();
 
         return Orders.builder()
                 .member(getMember(authentication))
                 .orderNumber(getOrderNumber())
                 .createdAt(LocalDateTime.now())
-                .address(orderCreateRequestDto.getAddress())
+                .address(createOrderDto.getAddress())
                 .paymentMethod(paymentMethod)
                 .totalPrice(totalPrice)
                 .build();
     }
-    private void handlePaymentMethod(Orders order, OrderCreateRequestDto orderCreateRequestDto) {
+    private void handlePaymentMethod(Orders order, CreateOrderDto createOrderDto) {
         PaymentMethod paymentMethod = order.getPaymentMethod();
         if (paymentMethod.getName().equals("포인트 결제")) {
             handlePointPayment(order);
@@ -90,18 +90,18 @@ public class OrderService {
         order.updateOrderStatus(orderStatusRepository.findById(2L).orElseThrow());
     }
 
-    private OrderItem buildOrderItem(Orders order, OrderCreateRequestDto orderCreateRequestDto) {
+    private OrderItem buildOrderItem(Orders order, CreateOrderDto createOrderDto) {
         return OrderItem.builder()
                 .orders(order)
-                .item(itemRepository.findById(orderCreateRequestDto.getItemId()).orElseThrow(() ->
+                .item(itemRepository.findById(createOrderDto.getItemId()).orElseThrow(() ->
                         new IllegalArgumentException("유효하지 않은 아이템입니다.")
                 ))
-                .quantity(orderCreateRequestDto.getQuantity())
+                .quantity(createOrderDto.getQuantity())
                 .build();
     }
 
-    private OrderCreateResponseDto buildOrderResponse(Orders order, OrderItem orderItem) {
-        CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
+    private ResponseCreateOrderDto buildOrderResponse(Orders order, OrderItem orderItem) {
+        ResponseItemInCartAndOrderDto responseItemInCartAndOrderDto = ResponseItemInCartAndOrderDto.builder()
                 .itemId(orderItem.getItem().getId())
                 .itemName(orderItem.getItem().getItemName())
                 .price(comma(orderItem.getItem().getPrice()))
@@ -111,11 +111,11 @@ public class OrderService {
                 .quantity(orderItem.getQuantity())
                 .build();
 
-        return OrderCreateResponseDto.builder()
+        return ResponseCreateOrderDto.builder()
                 .order_id(order.getId())
                 .order_number(order.getOrderNumber())
                 .created_at(order.getCreatedAt())
-                .item(cartAndOrderItemDto)
+                .item(responseItemInCartAndOrderDto)
                 .address(order.getAddress())
                 .total_price(comma(order.getTotalPrice()))
                 .orderStatus(order.getOrderStatus())
@@ -123,11 +123,11 @@ public class OrderService {
                 .build();
     }
 
-    public OrderInCartCreateResponseDto createOrderInCart(OrderInCartCreateRequestDto orderInCartCreateRequestDto, Authentication authentication) {
+    public ResponseCreateOrderInCartDto createOrderByCart(CreateOrderInCartDto createOrderInCartDto, Authentication authentication) {
         Member member = getMember(authentication);
 
         // 주문 생성
-        Orders newOrder = buildOrder(orderInCartCreateRequestDto, member);
+        Orders newOrder = buildOrder(createOrderInCartDto, member);
         orderRepository.save(newOrder);
 
         // 카트 조회 및 비어있으면 예외 처리
@@ -139,7 +139,7 @@ public class OrderService {
             throw new RuntimeException("카트가 비어 있습니다.");
         }
 
-        List<CartAndOrderItemDto> orderItemList = new ArrayList<>();
+        List<ResponseItemInCartAndOrderDto> orderItemList = new ArrayList<>();
         int totalPrice = 0;
 
         for (CartItem cartItem : cartItemsByMember) {
@@ -159,7 +159,7 @@ public class OrderService {
         return buildOrderResponse(newOrder, orderItemList, totalPrice);
     }
 
-    private Orders buildOrder(OrderInCartCreateRequestDto requestDto, Member member) {
+    private Orders buildOrder(CreateOrderInCartDto requestDto, Member member) {
         return Orders.builder()
                 .member(member)
                 .orderNumber(getOrderNumber())
@@ -178,8 +178,8 @@ public class OrderService {
                 .build();
     }
 
-    private CartAndOrderItemDto buildCartAndOrderItemDto(CartItem cartItem) {
-        return CartAndOrderItemDto.builder()
+    private ResponseItemInCartAndOrderDto buildCartAndOrderItemDto(CartItem cartItem) {
+        return ResponseItemInCartAndOrderDto.builder()
                 .itemId(cartItem.getItem().getId())
                 .itemName(cartItem.getItem().getItemName())
                 .color(cartItem.getItem().getColor())
@@ -203,8 +203,8 @@ public class OrderService {
         }
     }
 
-    private OrderInCartCreateResponseDto buildOrderResponse(Orders order, List<CartAndOrderItemDto> orderItemList, int totalPrice) {
-        return OrderInCartCreateResponseDto.builder()
+    private ResponseCreateOrderInCartDto buildOrderResponse(Orders order, List<ResponseItemInCartAndOrderDto> orderItemList, int totalPrice) {
+        return ResponseCreateOrderInCartDto.builder()
                 .orderId(order.getId())
                 .createdAt(order.getCreatedAt())
                 .orderNumber(order.getOrderNumber())
@@ -215,13 +215,13 @@ public class OrderService {
                 .totalPrice(comma(totalPrice))
                 .build();
     }
-    public List<OrderListDto> orderList(Pageable pageable, Authentication authentication){
+    public List<OrderListDto> getMyOrders(Pageable pageable, Authentication authentication){
         Member member = getMember(authentication);
         Page<Orders> orderListByMember = orderRepository.findAllByMember_id(member.getId(), pageable);
 
         List<OrderListDto> orderListDtoList = new ArrayList<>();
         for (Orders order : orderListByMember.getContent()) {
-            List<CartAndOrderItemDto> orderItemList =  new ArrayList<>();
+            List<ResponseItemInCartAndOrderDto> orderItemList =  new ArrayList<>();
 
             OrderListDto orderListDto = OrderListDto.builder()
                     .id(order.getId())
@@ -236,7 +236,7 @@ public class OrderService {
 
                 Item item = orderItem.getItem();
 
-                CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
+                ResponseItemInCartAndOrderDto responseItemInCartAndOrderDto = ResponseItemInCartAndOrderDto.builder()
                         .itemId(item.getId())
                         .itemName(item.getItemName())
                         .color(item.getColor())
@@ -246,7 +246,7 @@ public class OrderService {
                         .quantity(orderItem.getQuantity())
                         .build();
 
-                orderItemList.add(cartAndOrderItemDto);
+                orderItemList.add(responseItemInCartAndOrderDto);
             }
             orderListDto.setOrderItem(orderItemList);
             orderListDtoList.add(orderListDto);
@@ -255,16 +255,15 @@ public class OrderService {
     }
 
 
-    public List<OrderListDto> listByOrderStatus(Map<String, Long> orderStatusIdMap, Pageable pageable, Authentication authentication){
+    public List<OrderListDto> getOrderByStatus(Long statusId, Pageable pageable, Authentication authentication){
         Long member_id = getMember(authentication).getId();
-        Long orderStatusId = orderStatusIdMap.get("orderStatusId");
-        Page<Orders> orderList = orderRepository.findAllByMember_idAndOrderStatus_id(member_id,orderStatusId, pageable);
+        Page<Orders> orderList = orderRepository.findAllByMember_idAndOrderStatus_id(member_id,statusId, pageable);
 
         List<Orders> orders = orderList.getContent();
 
         List<OrderListDto> orderListDtoList = new ArrayList<>();
         for (Orders order : orders) {
-            List<CartAndOrderItemDto> orderItemList =  new ArrayList<>();
+            List<ResponseItemInCartAndOrderDto> orderItemList =  new ArrayList<>();
 
             OrderListDto orderListDto = OrderListDto.builder()
                     .id(order.getId())
@@ -279,7 +278,7 @@ public class OrderService {
 
                 Item item = orderItem.getItem();
 
-                CartAndOrderItemDto cartAndOrderItemDto = CartAndOrderItemDto.builder()
+                ResponseItemInCartAndOrderDto responseItemInCartAndOrderDto = ResponseItemInCartAndOrderDto.builder()
                         .itemId(item.getId())
                         .itemName(item.getItemName())
                         .color(item.getColor())
@@ -289,7 +288,7 @@ public class OrderService {
                         .quantity(orderItem.getQuantity())
                         .build();
 
-                orderItemList.add(cartAndOrderItemDto);
+                orderItemList.add(responseItemInCartAndOrderDto);
             }
             orderListDto.setOrderItem(orderItemList);
             orderListDtoList.add(orderListDto);
@@ -298,9 +297,8 @@ public class OrderService {
     }
 
 
-    public String delete(Map<String, Long> orderIdMap){
-        Long orderId = orderIdMap.get("order_id");
-        orderRepository.deleteById(orderId);
+    public String deleteOrder(Long id){
+        orderRepository.deleteById(id);
         return "DELETE DONE";
     }
 

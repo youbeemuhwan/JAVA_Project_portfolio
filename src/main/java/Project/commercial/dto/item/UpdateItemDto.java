@@ -6,10 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ItemModifiedRequestDto {
-
-    private Long id;
-
+public class UpdateItemDto {
     private Long categoryId;
 
     private Long detailCategoryId;

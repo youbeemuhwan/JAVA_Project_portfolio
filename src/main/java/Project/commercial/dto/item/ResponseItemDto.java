@@ -4,15 +4,17 @@ import Project.commercial.domain.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
-
+import javax.persistence.*;
 import java.util.List;
 
 @Getter
 @Setter
 @Builder
-public class ItemModifiedResponseDto {
-
+public class ResponseItemDto {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Category category;
@@ -27,13 +29,14 @@ public class ItemModifiedResponseDto {
 
     private Size size;
 
-    private Integer price;
+    private String price;
 
+    @Nullable
     private List<DetailImage> detailImages;
 
     private ThumbnailImage thumbnailImage;
 
-    public ItemModifiedResponseDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, Integer price, List<DetailImage> detailImages, ThumbnailImage thumbnailImage) {
+    public ResponseItemDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, String price, List<DetailImage> detailImages, ThumbnailImage thumbnailImage) {
         this.id = id;
         this.category = category;
         this.detailCategory = detailCategory;

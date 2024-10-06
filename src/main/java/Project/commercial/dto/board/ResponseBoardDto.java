@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class BoardCreateResponseDto {
+public class ResponseBoardDto {
 
     private Long id;
 
@@ -29,7 +29,7 @@ public class BoardCreateResponseDto {
 
     private List<BoardImage> boardImageList;
 
-    public BoardCreateResponseDto(Long id, String title, String content, Integer starRate, LocalDateTime createdAt, LocalDateTime modifiedAt, String username, List<BoardImage> boardImageList) {
+    public ResponseBoardDto(Long id, String title, String content, Integer starRate, LocalDateTime createdAt, LocalDateTime modifiedAt, String username, List<BoardImage> boardImageList) {
         this.id = id;
         this.title = title;
         this.content = content;

@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberSignUpDto {
+public class CreateMemberDto {
 
     private String email;
 
@@ -19,19 +19,19 @@ public class MemberSignUpDto {
 
 
     @Builder
-    public MemberSignUpDto(String email, String username, String password, Integer point) {
+    public CreateMemberDto(String email, String username, String password, Integer point) {
         this.email = email;
         this.username = username;
         this.password = password;
         this.point = point;
     }
 
-    public Member toEntity(MemberSignUpDto memberSignUpDto){
+    public Member toEntity(CreateMemberDto createMemberDto){
         return Member.builder()
-                .email(memberSignUpDto.getEmail())
-                .password(memberSignUpDto.getPassword())
-                .username(memberSignUpDto.getUsername())
-                .point(memberSignUpDto.getPoint())
+                .email(createMemberDto.getEmail())
+                .password(createMemberDto.getPassword())
+                .username(createMemberDto.getUsername())
+                .point(createMemberDto.getPoint())
                 .build();
 
     }

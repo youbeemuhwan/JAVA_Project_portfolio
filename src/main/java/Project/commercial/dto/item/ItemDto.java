@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,11 +28,11 @@ public class ItemDto {
 
     private String price;
 
-    private List<DetailImage> detailImages;
+    private List<DetailImageDto> detailImages;
 
-    private ThumbnailImage thumbnailImage;
+    private ResponseThumbnailImageDto thumbnailImage;
 
-    public ItemDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, String price, List<DetailImage> detailImages, ThumbnailImage thumbnailImage) {
+    public ItemDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, String price, List<DetailImageDto> detailImages, ResponseThumbnailImageDto thumbnailImage) {
         this.id = id;
         this.category = category;
         this.detailCategory = detailCategory;

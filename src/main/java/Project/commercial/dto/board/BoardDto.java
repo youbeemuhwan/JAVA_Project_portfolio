@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,16 +18,20 @@ public class BoardDto {
 
     private Long id;
 
+    @NotEmpty
     private String title;
 
+    @NotEmpty
     private String content;
 
+    @NotEmpty
     private Integer starRate;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;
 
+    @NotEmpty
     private MemberDto member;
 
     private List<BoardImage> boardImages;

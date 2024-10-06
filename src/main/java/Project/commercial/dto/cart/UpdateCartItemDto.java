@@ -8,14 +8,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CartItemModifiedRequestDto {
+public class UpdateCartItemDto {
 
     private Long cartItemId;
 
     private Integer quantity;
 
     @Builder
-    public CartItemModifiedRequestDto(Long cartItemId, Integer quantity) {
+    public UpdateCartItemDto(Long cartItemId, Integer quantity) {
         this.cartItemId = cartItemId;
         this.quantity = quantity;
     }

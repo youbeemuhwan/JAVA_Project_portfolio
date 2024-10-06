@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class BoardImageRequestDto {
+public class CreateBoardImagesDto {
 
     private String uploadImageName;
 
@@ -17,17 +17,17 @@ public class BoardImageRequestDto {
 
     private Board board;
 
-    public BoardImageRequestDto(String uploadImageName, String storeImageName, Board board) {
+    public CreateBoardImagesDto(String uploadImageName, String storeImageName, Board board) {
         this.uploadImageName = uploadImageName;
         this.storeImageName = storeImageName;
         this.board = board;
     }
 
-    public BoardImage toEntity(BoardImageRequestDto boardImageRequestDto) {
+    public BoardImage toEntity(CreateBoardImagesDto createBoardImagesDto) {
        return BoardImage.builder()
-                .uploadImageName(boardImageRequestDto.getUploadImageName())
-                .storeImageName(boardImageRequestDto.getStoreImageName())
-                .board(boardImageRequestDto.getBoard())
+                .uploadImageName(createBoardImagesDto.getUploadImageName())
+                .storeImageName(createBoardImagesDto.getStoreImageName())
+                .board(createBoardImagesDto.getBoard())
                 .build();
 
     }

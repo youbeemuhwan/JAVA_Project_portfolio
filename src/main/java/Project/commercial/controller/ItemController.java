@@ -12,59 +12,59 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Controller
+@RequestMapping("item")
 @RequiredArgsConstructor
 public class ItemController {
 
     private final ItemService itemService;
 
-    @PostMapping("/item/create")
+    @PostMapping()
     @ResponseBody
-    public ItemCreateResponseDto create(@RequestPart ItemCreateRequestDto itemCreateRequestDto,
-                                        @RequestPart MultipartFile thumbnail_image,
-                                        @RequestPart(required = false) List<MultipartFile> detail_images) throws IOException
+    public ResponseItemDto createItem(@RequestPart CreateItemDto createItemDto,
+                                      @RequestPart MultipartFile thumbnail_image,
+                                      @RequestPart(required = false) List<MultipartFile> detail_images) throws IOException
     {
-        return itemService.create(itemCreateRequestDto,thumbnail_image ,detail_images);
+        return itemService.createItem(createItemDto,thumbnail_image ,detail_images);
     }
 
-    @GetMapping("/item/list/detail")
+    @GetMapping("/{id}")
     @ResponseBody
-    public ItemDto detailPage(@RequestBody Map<String, Long> item_id_map)
+    public ItemDto getItemDetail(@PathVariable Long id)
     {
-        return itemService.detailPage(item_id_map);
+        return itemService.getItemDetail(id);
     }
 
-    @GetMapping("/item/list")
+    @GetMapping()
     @ResponseBody
-    public List<ItemDto> list(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
+    public List<ItemDto> getItems(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
     {
-        return itemService.list(pageable);
+        return itemService.getItems(pageable);
     }
 
-    @GetMapping("/item/list/search")
+    @GetMapping("/search")
     @ResponseBody
-    public ItemSearchResponseDto search(@RequestBody ItemSearchConditionDto itemSearchConditionDto, @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
+    public ItemSearchResponseDto getItemsBySearch(@RequestBody ItemSearchConditionDto itemSearchConditionDto, @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
     {
-        return itemService.search(itemSearchConditionDto, pageable);
+        return itemService.getItemsBySearch(itemSearchConditionDto, pageable);
     }
 
-    @DeleteMapping("/item/delete")
+    @DeleteMapping("/{id}")
     @ResponseBody
-    public String delete(@RequestBody Map<String, Long> itemIdMap)
+    public String deleteItem(@PathVariable() Long id)
     {
-        itemService.delete(itemIdMap);
+        itemService.deleteItem(id);
         return "Item Delete Done";
     }
 
-    @PatchMapping("/item/modified")
+    @PatchMapping("/{id}")
     @ResponseBody
-    public ItemModifiedResponseDto modified(@RequestPart ItemModifiedRequestDto itemModifiedRequestDto,
-                                            @RequestPart (required = false) MultipartFile new_thumbnail_image,
-                                            @RequestPart(required = false) List<MultipartFile> detail_images ) throws IOException
+    public void updateItem(@PathVariable() Long id, @RequestPart UpdateItemDto updateItemDto,
+                                            @RequestPart (required = false) MultipartFile newThumbnailImage,
+                                            @RequestPart(required = false) List<MultipartFile> detailImages ) throws IOException
     {
-       return  itemService.modified(itemModifiedRequestDto,new_thumbnail_image ,detail_images);
+        itemService.updateItem(id, updateItemDto,newThumbnailImage ,detailImages);
     }
 
     }

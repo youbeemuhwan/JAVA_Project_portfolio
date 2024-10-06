@@ -2,7 +2,7 @@ package Project.commercial.dto.order;
 
 import Project.commercial.domain.OrderStatus;
 import Project.commercial.domain.PaymentMethod;
-import Project.commercial.dto.cart.CartAndOrderItemDto;
+import Project.commercial.dto.cart.ResponseItemInCartAndOrderDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +22,7 @@ public class OrderListDto {
 
     private LocalDateTime createdAt;
 
-    private List<CartAndOrderItemDto> orderItem;
+    private List<ResponseItemInCartAndOrderDto> orderItem;
 
     private Integer totalPrice;
 
@@ -32,7 +32,7 @@ public class OrderListDto {
     @Nullable
     private OrderStatus orderStatus;
 
-    public OrderListDto(Long id, String orderNumber, LocalDateTime createdAt, List<CartAndOrderItemDto> orderItem, Integer totalPrice, @Nullable PaymentMethod paymentMethod, @Nullable OrderStatus orderStatus) {
+    public OrderListDto(Long id, String orderNumber, LocalDateTime createdAt, List<ResponseItemInCartAndOrderDto> orderItem, Integer totalPrice, @Nullable PaymentMethod paymentMethod, @Nullable OrderStatus orderStatus) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.createdAt = createdAt;

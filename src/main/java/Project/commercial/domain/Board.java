@@ -1,6 +1,6 @@
 package Project.commercial.domain;
 
-import Project.commercial.dto.board.BoardModifiedRequestDto;
+import Project.commercial.dto.board.UpdateBoardDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -54,10 +54,10 @@ public class Board {
         this.member = member;
     }
 
-    public void updateBoard(BoardModifiedRequestDto modifiedRequestDto){
+    public void updateBoard(UpdateBoardDto modifiedRequestDto){
         this.title = modifiedRequestDto.getTitle();
         this.content = modifiedRequestDto.getContent();
         this.starRate = modifiedRequestDto.getStarRate();
-        this.modifiedAt = modifiedRequestDto.getModified_at();
+        this.modifiedAt = modifiedRequestDto.getModifiedAt();
     }
 }

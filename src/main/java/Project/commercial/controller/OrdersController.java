@@ -11,46 +11,46 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
+@RequestMapping("order")
 @RequiredArgsConstructor
 public class OrdersController {
 
     private final OrderService orderService;
 
-    @PostMapping("/order/create")
+    @PostMapping()
     @ResponseBody
-    public OrderCreateResponseDto create(@RequestBody OrderCreateRequestDto orderCreateRequestDto, Authentication authentication)
+    public ResponseCreateOrderDto createOrder(@RequestBody CreateOrderDto createOrderDto, Authentication authentication)
     {
-        return orderService.orderCreate(orderCreateRequestDto, authentication);
+        return orderService.createOrder(createOrderDto, authentication);
     }
 
-    @GetMapping("/order/my_order")
+    @GetMapping("/my")
     @ResponseBody
-    public List<OrderListDto> list(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable, Authentication authentication)
+    public List<OrderListDto> getMyOrders(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable, Authentication authentication)
     {
-        return orderService.orderList(pageable, authentication);
+        return orderService.getMyOrders(pageable, authentication);
     }
 
-    @DeleteMapping("/order/delete")
+    @DeleteMapping("/{id}")
     @ResponseBody
-    public String delete(@RequestBody Map<String, Long> orderIdMap)
+    public String deleteOrder(@PathVariable() Long id)
     {
-        return orderService.delete(orderIdMap);
+        return orderService.deleteOrder(id);
     }
 
-    @PostMapping("/order/cart_order")
+    @PostMapping("/myCart")
     @ResponseBody
-    public OrderInCartCreateResponseDto createOrderInCart(@RequestBody OrderInCartCreateRequestDto orderInCartCreateRequestDto, Authentication authentication)
+    public ResponseCreateOrderInCartDto createOrderByCart(@RequestBody CreateOrderInCartDto createOrderInCartDto, Authentication authentication)
     {
-        return orderService.createOrderInCart(orderInCartCreateRequestDto, authentication);
+        return orderService.createOrderByCart(createOrderInCartDto, authentication);
     }
 
-    @GetMapping("order/my_order/order_status")
+    @GetMapping("/status/{id}")
     @ResponseBody
-    public List<OrderListDto> listByOrderStatus(@RequestBody Map<String, Long> orderStatusIdMap, @PageableDefault(size = 5) Pageable pageable, Authentication authentication)
+    public List<OrderListDto> getOrderByStatus(@PathVariable Long id, @PageableDefault(size = 5) Pageable pageable, Authentication authentication)
     {
-        return orderService.listByOrderStatus(orderStatusIdMap, pageable, authentication);
+        return orderService.getOrderByStatus(id, pageable, authentication);
     }
 }

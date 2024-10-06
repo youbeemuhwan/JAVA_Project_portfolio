@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class CartAndOrderItemDto {
+public class ResponseItemInCartAndOrderDto {
 
     private Long itemId;
 
@@ -26,7 +26,7 @@ public class CartAndOrderItemDto {
 
 
 
-    public CartAndOrderItemDto(Long itemId, String itemName, Color color, Size size, String price, Integer quantity, ThumbnailImage thumbnailImages) {
+    public ResponseItemInCartAndOrderDto(Long itemId, String itemName, Color color, Size size, String price, Integer quantity, ThumbnailImage thumbnailImages) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.color = color;

@@ -10,18 +10,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class CartItemCreateRequestDto {
+public class CreateCartItemDto {
 
     private Cart cart;
 
     private Item item;
 
     private Integer quantity;
-    public CartItem toEntity(CartItemCreateRequestDto cartItemCreateRequestDto){
+    public CartItem toEntity(CreateCartItemDto createCartItemDto){
         return CartItem.builder()
-                .item(cartItemCreateRequestDto.getItem())
-                .cart(cartItemCreateRequestDto.getCart())
-                .quantity(cartItemCreateRequestDto.getQuantity())
+                .item(createCartItemDto.getItem())
+                .cart(createCartItemDto.getCart())
+                .quantity(createCartItemDto.getQuantity())
                 .build();
     }
 

@@ -1,4 +1,5 @@
 package Project.commercial.controller;
+
 import Project.commercial.dto.board.*;
 import Project.commercial.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -13,79 +14,79 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 
 @Controller
+@RequestMapping()
 @RequiredArgsConstructor
 public class BoardController {
 
     private final BoardService boardService;
 
-    @PostMapping("/board/create")
+    @PostMapping("/board")
     @ResponseBody
-    public BoardCreateResponseDto create(@RequestPart(value = "BoardCreateRequestDto") BoardCreateRequestDto boardCreateRequestDto,
-                                         @Nullable @RequestPart(value = "files", required = false) List<MultipartFile> files
+    public ResponseBoardDto createBoard(@RequestPart(value = "BoardCreateRequestDto") CreateBoardDto createBoardDto,
+                                        @Nullable @RequestPart(value = "files", required = false) List<MultipartFile> files
                                          , Authentication authentication
                                          ) throws IOException
     {
-        return boardService.create(boardCreateRequestDto, files ,authentication);
+        return boardService.createBoard(createBoardDto, files ,authentication);
     }
 
-    @PatchMapping("/board/modified")
+    @PatchMapping("/board/{id}")
     @ResponseBody
-    public BoardModifiedResponseDto modified(@RequestBody BoardModifiedRequestDto boardModifiedRequestDto,
+    public void updateBoard(@PathVariable() Long id, @RequestBody UpdateBoardDto updateBoardDto,
                                              Authentication authentication)
     {
-        return boardService.modified(boardModifiedRequestDto, authentication);
+        boardService.updateBoard(id, updateBoardDto, authentication);
     }
 
-    @DeleteMapping("/board/delete")
+    @DeleteMapping("/board/{id}")
     @ResponseBody
-    public String delete(@RequestBody Map<String, Long> board_id_map,
+    public String deleteBoard(@PathVariable Long id,
                          Authentication authentication)
     {
-        boardService.delete(board_id_map, authentication);
+        boardService.deleteBoard(id, authentication);
         return "Delete Done";
     }
 
     @GetMapping("/board/list")
     @ResponseBody
-    public List<BoardDto> list(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC)
+    public List<BoardDto> getBoards(@PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC)
                                    Pageable pageable)
     {
-        return boardService.list(pageable);
+        return boardService.getBoards(pageable);
     }
 
 
     @GetMapping("/board/list/me")
     @ResponseBody
-    public List<BoardDto> listByMe(Authentication authentication,
+    public List<BoardDto> getMyBoards(Authentication authentication,
                                     @PageableDefault(size=5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
     {
-       return boardService.listByMe(authentication, pageable);
+       return boardService.getMyBoards(authentication, pageable);
     }
 
-    @GetMapping("/board/list/member")
+    @GetMapping("/member/{memberId}/board")
     @ResponseBody
-    public List<BoardDto> listByMember(@RequestParam Long member_id,
+    public List<BoardDto> getBoardsByMember(@PathVariable Long memberId,
                                        @PageableDefault(size=5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
     {
-        return boardService.listByMember(member_id, pageable);
+        return boardService.getBoardsByMember(memberId, pageable);
     }
 
-    @GetMapping("/board/list/search")
+    @GetMapping("/board/search")
     @ResponseBody
-    public List<BoardDto> search(@RequestParam String keyword,
+    public List<BoardDto> searchBoards(@RequestParam String keyword,
                               @PageableDefault(size = 5,sort = "id", direction = Sort.Direction.ASC) Pageable pageable)
     {
-        return boardService.search(keyword, pageable);
+        return boardService.searchBoards(keyword, pageable);
     }
 
-    @GetMapping("/board/list/detail")
+    @GetMapping("/board/{id}")
     @ResponseBody
-    public BoardDto detailPage(@RequestBody Map<String, Long> boardIdMap)
+    public BoardDto getBoardDetail(@PathVariable Long id)
     {
-        return boardService.detailPage(boardIdMap);
+        return boardService.getBoardDetail(id);
     }
 }

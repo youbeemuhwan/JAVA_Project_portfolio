@@ -2,21 +2,21 @@ package Project.commercial.dto.item;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-public class DetailImageListDto {
+@Builder
+public class ResponseThumbnailImageDto {
 
-    private Long id;
+
 
     private String storeImageName;
+    private Long itemId;
 
-    @Builder
-    public DetailImageListDto(Long id, String storeImageName) {
-        this.id = id;
+    public ResponseThumbnailImageDto(String storeImageName, Long itemId) {
         this.storeImageName = storeImageName;
+        this.itemId = itemId;
     }
 }
+

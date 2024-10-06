@@ -9,13 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class BoardImageResponseDto {
+public class ResponseBoardImageDto {
 
     private Long id;
 
     private String ImageName;
 
-    public BoardImageResponseDto(Long id, String imageName) {
+    public ResponseBoardImageDto(Long id, String imageName) {
         this.id = id;
         ImageName = imageName;
     }

@@ -1,7 +1,7 @@
 package Project.commercial.domain;
 
 
-import Project.commercial.dto.cart.CartItemModifiedRequestDto;
+import Project.commercial.dto.cart.UpdateCartItemDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -45,8 +45,8 @@ public class CartItem {
         this.cart = cart;
     }
 
-    public void updateCartItem(CartItemModifiedRequestDto cartItemModifiedRequestDto){
-        this.quantity = cartItemModifiedRequestDto.getQuantity();
+    public void updateCartItem(UpdateCartItemDto updateCartItemDto){
+        this.quantity = updateCartItemDto.getQuantity();
 
 
     }
