@@ -1,7 +1,6 @@
 package Project.commercial.domain;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import Project.commercial.enums.PaymentMethodEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,5 +18,7 @@ public class PaymentMethod {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "method")
+    private PaymentMethodEnum method;
 }

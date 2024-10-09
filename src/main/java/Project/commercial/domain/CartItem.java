@@ -38,11 +38,15 @@ public class CartItem {
     @JsonIgnore
     private Cart cart;
 
+    @Column(name = "cart_id", insertable = false, updatable = false)
+    private Long cartId;
     @Builder
-    public CartItem(Item item, Integer quantity, Cart cart) {
+    public CartItem(Long id, Item item, Integer quantity, Cart cart, Long cartId) {
+        this.id = id;
         this.item = item;
         this.quantity = quantity;
         this.cart = cart;
+        this.cartId = cartId;
     }
 
     public void updateCartItem(UpdateCartItemDto updateCartItemDto){

@@ -1,15 +1,15 @@
 package Project.commercial.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -37,7 +37,7 @@ public class Member {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     @BatchSize(size = 5)
-    private List<Board> board = new ArrayList<Board>();
+    private List<Board> board;
 
     @Builder
     public Member(String email, String username, String password, Integer point) {

@@ -31,11 +31,16 @@ public class ThumbnailImage {
     @JsonIgnore
     private Item item;
 
+    @Column(name = "item_id", insertable = false, updatable = false)
+    private Long itemId;
+
     @Builder
-    public ThumbnailImage(String uploadImageName, String storeImageName, Long fileSize, Item item) {
+    public ThumbnailImage(Long id, String uploadImageName, String storeImageName, Long fileSize, Item item, Long itemId) {
+        this.id = id;
         this.uploadImageName = uploadImageName;
         this.storeImageName = storeImageName;
         this.fileSize = fileSize;
         this.item = item;
+        this.itemId = itemId;
     }
 }

@@ -29,11 +29,15 @@ public class BoardImage {
     @JsonIgnore
     private Board board;
 
+    @Column(name = "board_id", insertable = false, updatable = false)
+    private Long boardId;
+
     @Builder
-    public BoardImage(Long id, String uploadImageName, String storeImageName, Board board) {
+    public BoardImage(Long id, String uploadImageName, String storeImageName, Board board, Long boardId) {
         this.id = id;
         this.uploadImageName = uploadImageName;
         this.storeImageName = storeImageName;
         this.board = board;
+        this.boardId = boardId;
     }
 }

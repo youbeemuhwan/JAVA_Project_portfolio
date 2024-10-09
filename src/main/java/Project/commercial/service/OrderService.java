@@ -3,6 +3,7 @@ package Project.commercial.service;
 import Project.commercial.domain.*;
 import Project.commercial.dto.cart.ResponseItemInCartAndOrderDto;
 import Project.commercial.dto.order.*;
+import Project.commercial.enums.PaymentMethodEnum;
 import Project.commercial.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +35,8 @@ public class OrderService {
 
 
     public ResponseCreateOrderDto createOrder(CreateOrderDto createOrderDto, Authentication authentication) {
-        Orders newOrder = buildOrder(createOrderDto, authentication);
+        Order newOrder = buildOrder(createOrderDto, authentication);
         orderRepository.save(newOrder);
-
         handlePaymentMethod(newOrder, createOrderDto);
 
         OrderItem newOrderItem = buildOrderItem(newOrder, createOrderDto);
@@ -45,7 +45,7 @@ public class OrderService {
         return buildOrderResponse(newOrder, newOrderItem);
     }
 
-    private Orders buildOrder(CreateOrderDto createOrderDto, Authentication authentication) {
+    private Order buildOrder(CreateOrderDto createOrderDto, Authentication authentication) {
         PaymentMethod paymentMethod = paymentMethodRepository.findById(createOrderDto.getPaymentMethodId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 결제 수단입니다."));
 
@@ -56,7 +56,7 @@ public class OrderService {
 
         int totalPrice = item.getPrice() * createOrderDto.getQuantity();
 
-        return Orders.builder()
+        return Order.builder()
                 .member(getMember(authentication))
                 .orderNumber(getOrderNumber())
                 .createdAt(LocalDateTime.now())
@@ -65,16 +65,16 @@ public class OrderService {
                 .totalPrice(totalPrice)
                 .build();
     }
-    private void handlePaymentMethod(Orders order, CreateOrderDto createOrderDto) {
+    private void handlePaymentMethod(Order order, CreateOrderDto createOrderDto) {
         PaymentMethod paymentMethod = order.getPaymentMethod();
-        if (paymentMethod.getName().equals("포인트 결제")) {
+        if (paymentMethod.getMethod().equals(PaymentMethodEnum.CARD)) {
             handlePointPayment(order);
-        } else if (paymentMethod.getName().equals("무통장 입금")) {
-            order.updateOrderStatus(orderStatusRepository.findById(1L).orElseThrow());
+        } else if (paymentMethod.getMethod().equals(PaymentMethodEnum.MOBILE_PAYMENT)) {
+            order.updateOrderStatus(createOrderDto.getOrderStatusId());
         }
     }
 
-    private void handlePointPayment(Orders order) {
+    private void handlePointPayment(Order order) {
         Member member = memberRepository.findById(order.getMember().getId()).orElseThrow(() ->
                 new IllegalArgumentException("유효하지 않은 회원입니다.")
         );
@@ -87,12 +87,12 @@ public class OrderService {
 
         int remainingPoint = nowPoint - totalPrice;
         member.updateMemberPoint(remainingPoint);
-        order.updateOrderStatus(orderStatusRepository.findById(2L).orElseThrow());
+        order.updateOrderStatus(order.getOrderStatusId());
     }
 
-    private OrderItem buildOrderItem(Orders order, CreateOrderDto createOrderDto) {
+    private OrderItem buildOrderItem(Order order, CreateOrderDto createOrderDto) {
         return OrderItem.builder()
-                .orders(order)
+                .order(order)
                 .item(itemRepository.findById(createOrderDto.getItemId()).orElseThrow(() ->
                         new IllegalArgumentException("유효하지 않은 아이템입니다.")
                 ))
@@ -100,7 +100,7 @@ public class OrderService {
                 .build();
     }
 
-    private ResponseCreateOrderDto buildOrderResponse(Orders order, OrderItem orderItem) {
+    private ResponseCreateOrderDto buildOrderResponse(Order order, OrderItem orderItem) {
         ResponseItemInCartAndOrderDto responseItemInCartAndOrderDto = ResponseItemInCartAndOrderDto.builder()
                 .itemId(orderItem.getItem().getId())
                 .itemName(orderItem.getItem().getItemName())
@@ -127,7 +127,7 @@ public class OrderService {
         Member member = getMember(authentication);
 
         // 주문 생성
-        Orders newOrder = buildOrder(createOrderInCartDto, member);
+        Order newOrder = buildOrder(createOrderInCartDto, member);
         orderRepository.save(newOrder);
 
         // 카트 조회 및 비어있으면 예외 처리
@@ -159,8 +159,8 @@ public class OrderService {
         return buildOrderResponse(newOrder, orderItemList, totalPrice);
     }
 
-    private Orders buildOrder(CreateOrderInCartDto requestDto, Member member) {
-        return Orders.builder()
+    private Order buildOrder(CreateOrderInCartDto requestDto, Member member) {
+        return Order.builder()
                 .member(member)
                 .orderNumber(getOrderNumber())
                 .createdAt(LocalDateTime.now())
@@ -170,9 +170,9 @@ public class OrderService {
                 .build();
     }
 
-    private OrderItem buildOrderItem(Orders order, CartItem cartItem) {
+    private OrderItem buildOrderItem(Order order, CartItem cartItem) {
         return OrderItem.builder()
-                .orders(order)
+                .order(order)
                 .item(cartItem.getItem())
                 .quantity(cartItem.getQuantity())
                 .build();
@@ -190,20 +190,20 @@ public class OrderService {
                 .build();
     }
 
-    private void processPayment(Member member, Orders order, int totalPrice) {
-        if (order.getPaymentMethod().getName().equals("포인트 결제")) {
+    private void processPayment(Member member, Order order, int totalPrice) {
+        if (order.getPaymentMethod().getMethod().equals(PaymentMethodEnum.POINT)){
             if (member.getPoint() < totalPrice) {
                 throw new RuntimeException("포인트가 부족합니다.");
             }
             int remainingPoint = member.getPoint() - totalPrice;
             member.updateMemberPoint(remainingPoint);
-            order.updateOrderStatus(orderStatusRepository.findById(2L).orElseThrow());
-        } else if (order.getPaymentMethod().getName().equals("무통장 입금")) {
-            order.updateOrderStatus(orderStatusRepository.findById(1L).orElseThrow());
+            order.updateOrderStatus(2L);
+        } else if (order.getPaymentMethod().getMethod().equals(PaymentMethodEnum.BANK_TRANSFER)) {
+            order.updateOrderStatus(1L);
         }
     }
 
-    private ResponseCreateOrderInCartDto buildOrderResponse(Orders order, List<ResponseItemInCartAndOrderDto> orderItemList, int totalPrice) {
+    private ResponseCreateOrderInCartDto buildOrderResponse(Order order, List<ResponseItemInCartAndOrderDto> orderItemList, int totalPrice) {
         return ResponseCreateOrderInCartDto.builder()
                 .orderId(order.getId())
                 .createdAt(order.getCreatedAt())
@@ -217,10 +217,10 @@ public class OrderService {
     }
     public List<OrderListDto> getMyOrders(Pageable pageable, Authentication authentication){
         Member member = getMember(authentication);
-        Page<Orders> orderListByMember = orderRepository.findAllByMember_id(member.getId(), pageable);
+        Page<Order> orderListByMember = orderRepository.findAllByMember_id(member.getId(), pageable);
 
         List<OrderListDto> orderListDtoList = new ArrayList<>();
-        for (Orders order : orderListByMember.getContent()) {
+        for (Order order : orderListByMember.getContent()) {
             List<ResponseItemInCartAndOrderDto> orderItemList =  new ArrayList<>();
 
             OrderListDto orderListDto = OrderListDto.builder()
@@ -257,12 +257,12 @@ public class OrderService {
 
     public List<OrderListDto> getOrderByStatus(Long statusId, Pageable pageable, Authentication authentication){
         Long member_id = getMember(authentication).getId();
-        Page<Orders> orderList = orderRepository.findAllByMember_idAndOrderStatus_id(member_id,statusId, pageable);
+        Page<Order> orderList = orderRepository.findAllByMember_idAndOrderStatus_id(member_id,statusId, pageable);
 
-        List<Orders> orders = orderList.getContent();
+        List<Order> orders = orderList.getContent();
 
         List<OrderListDto> orderListDtoList = new ArrayList<>();
-        for (Orders order : orders) {
+        for (Order order : orders) {
             List<ResponseItemInCartAndOrderDto> orderItemList =  new ArrayList<>();
 
             OrderListDto orderListDto = OrderListDto.builder()

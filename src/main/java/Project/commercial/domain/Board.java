@@ -41,17 +41,22 @@ public class Board {
     @JsonIgnore
     private Member member;
 
+    @Column(name = "member_id", insertable = false, updatable = false)
+    private Long memberId;
+
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardImage> boardImageList;
-
     @Builder
-    public Board(String title, String content, Integer starRate, LocalDateTime createdAt, LocalDateTime modifiedAt, Member member) {
+    public Board(Long id, String title, String content, Integer starRate, LocalDateTime createdAt, LocalDateTime modifiedAt, Member member, Long memberId, List<BoardImage> boardImageList) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.starRate = starRate;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
         this.member = member;
+        this.memberId = memberId;
+        this.boardImageList = boardImageList;
     }
 
     public void updateBoard(UpdateBoardDto modifiedRequestDto){

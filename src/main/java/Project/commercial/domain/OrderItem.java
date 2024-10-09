@@ -19,20 +19,29 @@ public class OrderItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orders_id")
     @JsonIgnore
-    private Orders orders;
+    private Order order;
+
+    @Column(name = "order_id", insertable = false, updatable = false)
+    private Long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
+
+    @Column(name = "item_id", insertable = false, updatable = false)
+    private Long itemId;
 
     @Min(1)
     @Max(99)
     private Integer quantity;
 
     @Builder
-    public OrderItem(Orders orders, Item item, Integer quantity) {
-        this.orders = orders;
+    public OrderItem(Long id, Order order, Long orderId, Item item, Long itemId, Integer quantity) {
+        this.id = id;
+        this.order = order;
+        this.orderId = orderId;
         this.item = item;
+        this.itemId = itemId;
         this.quantity = quantity;
     }
 }

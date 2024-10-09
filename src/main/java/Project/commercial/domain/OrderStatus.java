@@ -1,13 +1,12 @@
 package Project.commercial.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import Project.commercial.enums.OrderStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Getter
@@ -18,8 +17,9 @@ public class OrderStatus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "method")
+    private OrderStatusEnum status;
 
 
 }

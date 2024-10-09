@@ -23,9 +23,9 @@ public class ResponseUpdateItemDto {
 
     private String description;
 
-    private Color color;
+    private Long colorId;
 
-    private Size size;
+    private Long sizeId;
 
     private Integer price;
 
@@ -33,14 +33,14 @@ public class ResponseUpdateItemDto {
 
     private ThumbnailImage thumbnailImage;
 
-    public ResponseUpdateItemDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Color color, Size size, Integer price, List<DetailImage> detailImages, ThumbnailImage thumbnailImage) {
+    public ResponseUpdateItemDto(Long id, Category category, DetailCategory detailCategory, String itemName, String description, Long colorId, Long sizeId, Integer price, List<DetailImage> detailImages, ThumbnailImage thumbnailImage) {
         this.id = id;
         this.category = category;
         this.detailCategory = detailCategory;
         this.itemName = itemName;
         this.description = description;
-        this.color = color;
-        this.size = size;
+        this.colorId = colorId;
+        this.sizeId = sizeId;
         this.price = price;
         this.detailImages = detailImages;
         this.thumbnailImage = thumbnailImage;
